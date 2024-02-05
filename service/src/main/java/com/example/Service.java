@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.entity.Role;
 import com.example.entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -28,6 +29,7 @@ public class Service {
                     .firstname("222")
                     .lastname("333")
                     .birthDate(LocalDate.of(2000, 1, 15))
+                    .role(Role.ADMIN)
                     .build();
 
             session.persist(user);
