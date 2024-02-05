@@ -1,11 +1,21 @@
 package com.example;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
 public class Service {
 
     private final static Common common = new Common();
 
     public static void main(String[] args) {
-        serviceMethod();
+        Configuration configuration = new Configuration();
+        configuration.configure();
+
+        try (SessionFactory sessionFactory = configuration.buildSessionFactory();
+             Session session = sessionFactory.openSession()) {
+            System.out.println("##");
+        }
     }
 
     public static void serviceMethod() {
