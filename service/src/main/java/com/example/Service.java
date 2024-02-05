@@ -24,7 +24,6 @@ public class Service {
             session.beginTransaction();
 
             User user = User.builder()
-                    .id(1L)
                     .username("11")
                     .firstname("222")
                     .lastname("333")
