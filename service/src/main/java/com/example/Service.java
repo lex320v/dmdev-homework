@@ -1,6 +1,7 @@
 package com.example;
 
 public class Service {
+
     private final static Common common = new Common();
 
     public static void main(String[] args) {

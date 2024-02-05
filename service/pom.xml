@@ -7,7 +7,6 @@
     </parent>
 
     <artifactId>service</artifactId>
-    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
