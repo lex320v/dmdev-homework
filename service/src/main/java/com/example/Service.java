@@ -1,5 +1,10 @@
 package com.example;
 
+import com.example.entity.Car;
+import com.example.entity.Comment;
+import com.example.entity.MediaItem;
+import com.example.entity.Payment;
+import com.example.entity.Request;
 import com.example.entity.Role;
 import com.example.entity.User;
 import org.hibernate.Session;
@@ -16,6 +21,11 @@ public class Service {
     public static void main(String[] args) {
         Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(User.class);
+        configuration.addAnnotatedClass(Car.class);
+        configuration.addAnnotatedClass(Request.class);
+        configuration.addAnnotatedClass(Comment.class);
+        configuration.addAnnotatedClass(Payment.class);
+        configuration.addAnnotatedClass(MediaItem.class);
         configuration.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
         configuration.configure();
 
@@ -38,12 +48,4 @@ public class Service {
             System.out.println("##");
         }
     }
-
-    public static void serviceMethod() {
-        String commonValue = common.commonMethod();
-
-        System.out.println("log from service");
-        System.out.println("value from common: " + commonValue);
-    }
-
 }

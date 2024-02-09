@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -29,6 +30,8 @@ public class User {
     private String firstname;
     private String lastname;
     private LocalDate birthDate;
+    private Long balance;
     @Enumerated(EnumType.STRING)
     private Role role;
+    private Date createdAt;
 }

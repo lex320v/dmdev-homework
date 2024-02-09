@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -19,14 +20,15 @@ import java.time.LocalDate;
 @Builder
 @Entity(name = "requests")
 public class Request {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private int ownerId;
+    private int carId;
     private int clientId;
     private LocalDate dateFrom;
     private LocalDate dateTo;
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
+    private Date createdAt;
 }
