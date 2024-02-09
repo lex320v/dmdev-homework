@@ -33,5 +33,7 @@ public class User {
     private Long balance;
     @Enumerated(EnumType.STRING)
     private Role role;
+    private Gender gender;
+    private UserStatus status;
     private Date createdAt;
 }

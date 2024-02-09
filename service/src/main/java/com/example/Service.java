@@ -4,6 +4,7 @@ import com.example.entity.Car;
 import com.example.entity.Comment;
 import com.example.entity.MediaItem;
 import com.example.entity.Payment;
+import com.example.entity.PersonalInfo;
 import com.example.entity.Request;
 import com.example.entity.Role;
 import com.example.entity.User;
@@ -25,6 +26,7 @@ public class Service {
         configuration.addAnnotatedClass(Request.class);
         configuration.addAnnotatedClass(Comment.class);
         configuration.addAnnotatedClass(Payment.class);
+        configuration.addAnnotatedClass(PersonalInfo.class);
         configuration.addAnnotatedClass(MediaItem.class);
         configuration.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
         configuration.configure();
