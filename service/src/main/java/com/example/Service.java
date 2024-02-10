@@ -1,7 +1,8 @@
 package com.example;
 
 import com.example.entity.Car;
-import com.example.entity.Comment;
+import com.example.entity.CarToMediaItem;
+import com.example.entity.Feedback;
 import com.example.entity.MediaItem;
 import com.example.entity.Payment;
 import com.example.entity.PersonalInfo;
@@ -24,10 +25,11 @@ public class Service {
         configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Car.class);
         configuration.addAnnotatedClass(Request.class);
-        configuration.addAnnotatedClass(Comment.class);
+        configuration.addAnnotatedClass(Feedback.class);
         configuration.addAnnotatedClass(Payment.class);
         configuration.addAnnotatedClass(PersonalInfo.class);
         configuration.addAnnotatedClass(MediaItem.class);
+        configuration.addAnnotatedClass(CarToMediaItem.class);
         configuration.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
         configuration.configure();
 

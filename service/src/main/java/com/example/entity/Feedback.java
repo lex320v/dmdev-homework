@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "comments")
-public class Comment {
+@Entity(name = "feedbacks")
+public class Feedback {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +24,6 @@ public class Comment {
     private String text;
     private int rating;
     private Long userId;
-    private Long carId;
+    private Long requestId;
     private LocalDateTime createdAt;
 }

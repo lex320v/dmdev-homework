@@ -12,7 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -26,10 +26,10 @@ public class Request {
     private Long id;
     private int carId;
     private int clientId;
-    private LocalDate dateFrom;
-    private LocalDate dateTo;
+    private LocalDateTime dateFrom;
+    private LocalDateTime dateTo;
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
     private String comment;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 }

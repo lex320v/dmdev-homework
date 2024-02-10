@@ -1,6 +1,8 @@
 package com.example.entity;
 
+import com.example.entity.enums.DriverLicenseCategories;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,14 +17,8 @@ import java.util.List;
 @Builder
 @Entity(name = "personal_info")
 public class PersonalInfo {
+    @Id
     private Long userId;
-
-    private Integer passportSeries;
-    private Integer passportNumber;
-    private String passportPlaceOfBirth;
-    private String passportDepartmentCode;
-    private LocalDate passportDateOfIssue;
-    private String passportIssuedBy;
 
     private String driverLicenseSurname;
     private String driverLicenseName;
@@ -33,5 +29,5 @@ public class PersonalInfo {
     private String driverLicenseIssuedBy;
     private String driverLicenseCode;
     private String driverLicenseResidence;
-    private List<String> driverLicenseCategories;
+    private List<DriverLicenseCategories> driverLicenseCategories;
 }

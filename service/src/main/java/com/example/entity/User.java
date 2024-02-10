@@ -39,5 +39,7 @@ public class User {
     private Role role;
     private Gender gender;
     private UserStatus status;
+    private Long avatarMediaItemId;
+    private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
 }

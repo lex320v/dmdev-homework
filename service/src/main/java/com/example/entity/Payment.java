@@ -21,8 +21,7 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long senderId;
-    private Long recipientId;
+    private Long requestId;
     private Long amount;
     private LocalDate createdAt;
 }
