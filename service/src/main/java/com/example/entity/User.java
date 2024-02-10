@@ -37,7 +37,9 @@ public class User {
     private Long balance;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @Enumerated(EnumType.STRING)
     private Gender gender;
+    @Enumerated(EnumType.STRING)
     private UserStatus status;
     private Long avatarMediaItemId;
     private LocalDateTime deletedAt;
