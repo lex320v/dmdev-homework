@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.entity.enums.MediaItemType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,7 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -26,5 +27,5 @@ public class MediaItem {
     private String previewLink;
     private String link;
     private Long userId;
-    private Date createdAt;
+    private LocalDate createdAt;
 }

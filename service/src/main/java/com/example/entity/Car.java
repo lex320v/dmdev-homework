@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.entity.enums.CarType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,7 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -32,5 +33,5 @@ public class Car {
     private Long userId;
     @Enumerated(EnumType.STRING)
     private CarType type;
-    private Date createdAt;
+    private LocalDateTime createdAt;
 }

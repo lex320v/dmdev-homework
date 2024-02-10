@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.entity.enums.RequestStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,7 +13,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -31,5 +31,5 @@ public class Request {
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
     private String comment;
-    private Date createdAt;
+    private LocalDate createdAt;
 }

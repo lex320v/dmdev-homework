@@ -6,7 +6,7 @@ import com.example.entity.MediaItem;
 import com.example.entity.Payment;
 import com.example.entity.PersonalInfo;
 import com.example.entity.Request;
-import com.example.entity.Role;
+import com.example.entity.enums.Role;
 import com.example.entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

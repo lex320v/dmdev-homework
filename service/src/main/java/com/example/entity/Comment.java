@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -25,5 +25,5 @@ public class Comment {
     private int rating;
     private Long userId;
     private Long carId;
-    private Date createdAt;
+    private LocalDateTime createdAt;
 }
