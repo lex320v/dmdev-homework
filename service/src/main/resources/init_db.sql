@@ -2,7 +2,7 @@ create table media_items
 (
     id           bigserial not null,
     created_at   date,
-    type         varchar(20) check (type in ('AVATAR', 'CAR_PREVIEW', 'CAR_VIDEO', 'CAR_SOUND')),
+    type         varchar(20) check (type in ('AVATAR', 'CAR_IMAGE', 'CAR_VIDEO')),
     uploader_id  bigint,
     link         varchar(255),
     mime_type    varchar(255),
@@ -23,7 +23,7 @@ create table users
     firstname            varchar(255),
     lastname             varchar(255),
     password             varchar(255),
-    role                 varchar(20) check (role in ('ADMIN', 'OWNER', 'CLIENT')),
+    role                 varchar(20) check (role in ('SUPER_ADMIN', 'ADMIN', 'OWNER', 'CLIENT')),
     username             varchar(255) unique,
     primary key (id)
 );
