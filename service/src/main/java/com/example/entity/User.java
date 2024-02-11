@@ -34,7 +34,6 @@ public class User {
     private String firstname;
     private String lastname;
     private LocalDate birthDate;
-    private Long balance;
     @Enumerated(EnumType.STRING)
     private Role role;
     @Enumerated(EnumType.STRING)

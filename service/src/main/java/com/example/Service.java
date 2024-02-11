@@ -4,7 +4,6 @@ import com.example.entity.Car;
 import com.example.entity.CarToMediaItem;
 import com.example.entity.Feedback;
 import com.example.entity.MediaItem;
-import com.example.entity.Payment;
 import com.example.entity.PersonalInfo;
 import com.example.entity.Request;
 import com.example.entity.enums.Role;
@@ -26,7 +25,6 @@ public class Service {
         configuration.addAnnotatedClass(Car.class);
         configuration.addAnnotatedClass(Request.class);
         configuration.addAnnotatedClass(Feedback.class);
-        configuration.addAnnotatedClass(Payment.class);
         configuration.addAnnotatedClass(PersonalInfo.class);
         configuration.addAnnotatedClass(MediaItem.class);
         configuration.addAnnotatedClass(CarToMediaItem.class);
@@ -45,7 +43,8 @@ public class Service {
                     .role(Role.ADMIN)
                     .build();
 
-            session.persist(user);
+//            session.persist(user);
+            session.get(User.class, 1);
 
             session.getTransaction().commit();
 

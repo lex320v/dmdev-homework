@@ -17,7 +17,6 @@ create table users
     gender               varchar(20) check (gender in ('MALE', 'FEMALE')),
     status               varchar(20) check (status in ('ACTIVE', 'INACTIVE')),
     avatar_media_item_id bigint references media_items (id),
-    balance              bigint,
     created_at           timestamp(6),
     deleted_at           timestamp(6),
     firstname            varchar(255),
@@ -87,14 +86,5 @@ create table requests
     date_to    timestamp(6),
     comment    varchar(255),
     status     varchar(20) check (status in ('OPEN', 'PROCESSING', 'CLOSED', 'REJECTED')),
-    primary key (id)
-);
-
-create table payments
-(
-    id         bigserial not null,
-    created_at date,
-    amount     bigint,
-    request_id bigint,
     primary key (id)
 );
