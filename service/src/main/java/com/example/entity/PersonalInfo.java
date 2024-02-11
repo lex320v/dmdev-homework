@@ -17,6 +17,7 @@ import java.util.List;
 @Builder
 @Entity(name = "personal_info")
 public class PersonalInfo {
+
     @Id
     private Long userId;
 

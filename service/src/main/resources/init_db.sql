@@ -51,7 +51,7 @@ create table cars
     price        float(53) not null,
     year         integer   not null,
     created_at   timestamp(6),
-    user_id      bigint,
+    owner_id     bigint,
     manufacturer varchar(255),
     model        varchar(255),
     type         varchar(20) check (type in ('SEDAN', 'CROSSOVER', 'HATCHBACK', 'PICKUP', 'SPORT_CAR')),

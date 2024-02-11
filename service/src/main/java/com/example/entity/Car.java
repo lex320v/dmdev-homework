@@ -30,7 +30,7 @@ public class Car {
     private int horsepower;
     private double price;
     private boolean isActive;
-    private Long userId;
+    private Long ownerId;
     @Enumerated(EnumType.STRING)
     private CarType type;
     private LocalDateTime createdAt;
