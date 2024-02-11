@@ -23,7 +23,6 @@ public class Feedback {
     private Long id;
     private String text;
     private int rating;
-    private Long userId;
     private Long requestId;
     private LocalDateTime createdAt;
 }

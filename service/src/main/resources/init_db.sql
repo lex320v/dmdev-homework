@@ -1,7 +1,7 @@
 create table media_items
 (
     id           bigserial not null,
-    created_at   date,
+    created_at   timestamp(6),
     type         varchar(20) check (type in ('AVATAR', 'CAR_IMAGE', 'CAR_VIDEO')),
     uploader_id  bigint,
     link         varchar(255),
@@ -71,7 +71,6 @@ create table feedbacks
     rating     integer   not null,
     created_at timestamp(6),
     request_id bigint,
-    user_id    bigint,
     text       varchar(255),
     primary key (id)
 );

@@ -12,7 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -30,5 +30,5 @@ public class MediaItem {
     private String previewLink;
     private String link;
     private Long uploaderId;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 }
