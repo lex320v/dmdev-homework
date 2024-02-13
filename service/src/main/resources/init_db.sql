@@ -1,89 +1,83 @@
-create table media_items
+CREATE TABLE media_item
 (
-    id           bigserial not null,
-    created_at   timestamp(6),
-    type         varchar(20) check (type in ('AVATAR', 'CAR_IMAGE', 'CAR_VIDEO')),
-    uploader_id  bigint,
-    link         varchar(255),
-    mime_type    varchar(255),
-    preview_link varchar(255),
-    primary key (id)
+    id           BIGSERIAL PRIMARY KEY,
+    created_at   TIMESTAMP(6) NOT NULL,
+    type         VARCHAR(20) CHECK (type IN ('AVATAR', 'CAR_IMAGE', 'CAR_VIDEO')) NOT NULL,
+    uploader_id  BIGINT NOT NULL,
+    link         VARCHAR(255) NOT NULL,
+    mime_type    VARCHAR(255) NOT NULL,
+    preview_link VARCHAR(255)
 );
 
-create table users
+CREATE TABLE users
 (
-    id                   bigserial not null,
-    birth_date           date,
-    gender               varchar(20) check (gender in ('MALE', 'FEMALE')),
-    status               varchar(20) check (status in ('ACTIVE', 'INACTIVE')),
-    avatar_media_item_id bigint references media_items (id),
-    created_at           timestamp(6),
-    deleted_at           timestamp(6),
-    firstname            varchar(255),
-    lastname             varchar(255),
-    password             varchar(255),
-    role                 varchar(20) check (role in ('SUPER_ADMIN', 'ADMIN', 'OWNER', 'CLIENT')),
-    username             varchar(255) unique,
-    primary key (id)
+    id                   BIGSERIAL PRIMARY KEY,
+    birth_date           DATE,
+    gender               VARCHAR(20) CHECK (gender IN ('MALE', 'FEMALE')),
+    status               VARCHAR(20) CHECK (status IN ('ACTIVE', 'INACTIVE')),
+    avatar_media_item_id BIGINT,
+    created_at           TIMESTAMP(6),
+    deleted_at           TIMESTAMP(6),
+    firstname            VARCHAR(255),
+    lastname             VARCHAR(255),
+    password             VARCHAR(255),
+    role                 VARCHAR(20) CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'OWNER', 'CLIENT')),
+    username             VARCHAR(255) UNIQUE
 );
 
-create table personal_info
+CREATE TABLE personal_info
 (
-    user_id                       bigint not null,
-    driver_license_date_of_birth  date,
-    driver_license_date_of_expire date,
-    driver_license_date_of_issue  date,
-    driver_license_code           varchar(255),
-    driver_license_issued_by      varchar(255),
-    driver_license_name           varchar(255),
-    driver_license_place_of_birth varchar(255),
-    driver_license_residence      varchar(255),
-    driver_license_surname        varchar(255),
-    driver_license_categories     smallint array,
-    primary key (user_id)
+    user_id                       BIGINT PRIMARY KEY,
+    driver_license_date_of_birth  DATE,
+    driver_license_date_of_expire DATE,
+    driver_license_date_of_issue  DATE,
+    driver_license_code           VARCHAR(255),
+    driver_license_issued_by      VARCHAR(255),
+    driver_license_name           VARCHAR(255),
+    driver_license_place_of_birth VARCHAR(255),
+    driver_license_residence      VARCHAR(255),
+    driver_license_surname        VARCHAR(255),
+    driver_license_categories     SMALLINT ARRAY
 );
 
-create table cars
+CREATE TABLE car
 (
-    id           bigserial not null,
-    horsepower   integer   not null,
-    is_active    boolean   not null,
-    price        float(53) not null,
-    year         integer   not null,
-    created_at   timestamp(6),
-    owner_id     bigint,
-    manufacturer varchar(255),
-    model        varchar(255),
-    type         varchar(20) check (type in ('SEDAN', 'CROSSOVER', 'HATCHBACK', 'PICKUP', 'SPORT_CAR')),
-    primary key (id)
+    id           BIGSERIAL PRIMARY KEY,
+    horsepower   INTEGER   NOT NULL,
+    is_active    BOOLEAN   NOT NULL,
+    price        FLOAT(53) NOT NULL,
+    year         INTEGER   NOT NULL,
+    created_at   TIMESTAMP(6),
+    owner_id     BIGINT,
+    manufacturer VARCHAR(255),
+    model        VARCHAR(255),
+    type         VARCHAR(20) CHECK (type IN ('SEDAN', 'CROSSOVER', 'HATCHBACK', 'PICKUP', 'SPORT_CAR'))
 );
 
-create table car_to_media_item
+CREATE TABLE car_to_media_item
 (
-    car_id        bigint not null,
-    media_item_id bigint not null,
-    primary key (car_id, media_item_id)
+    car_id        BIGINT NOT NULL,
+    media_item_id BIGINT NOT NULL,
+    PRIMARY KEY (car_id, media_item_id)
 );
 
-create table feedbacks
+CREATE TABLE feedback
 (
-    id         bigserial not null,
-    rating     integer   not null,
-    created_at timestamp(6),
-    request_id bigint,
-    text       varchar(255),
-    primary key (id)
+    id         BIGSERIAL PRIMARY KEY,
+    rating     INTEGER NOT NULL,
+    created_at TIMESTAMP(6),
+    request_id BIGINT,
+    text       VARCHAR(255)
 );
 
-create table requests
+CREATE TABLE request
 (
-    id         bigserial not null,
-    car_id     integer   not null,
-    client_id  integer   not null,
-    created_at timestamp(6),
-    date_from  timestamp(6),
-    date_to    timestamp(6),
-    comment    varchar(255),
-    status     varchar(20) check (status in ('OPEN', 'PROCESSING', 'CLOSED', 'REJECTED')),
-    primary key (id)
+    id         BIGSERIAL PRIMARY KEY,
+    car_id     INTEGER NOT NULL,
+    client_id  INTEGER NOT NULL,
+    created_at TIMESTAMP(6),
+    date_time_from  TIMESTAMP(6),
+    date_time_to    TIMESTAMP(6),
+    comment    VARCHAR(255),
+    status     VARCHAR(20) CHECK (status IN ('OPEN', 'PROCESSING', 'CLOSED', 'REJECTED'))
 );

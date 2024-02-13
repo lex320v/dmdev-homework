@@ -15,8 +15,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -41,6 +41,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
     private Long avatarMediaItemId;
-    private LocalDateTime deletedAt;
-    private LocalDateTime createdAt;
+    private Instant deletedAt;
+    private Instant createdAt;
 }

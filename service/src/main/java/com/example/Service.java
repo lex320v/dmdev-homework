@@ -43,7 +43,6 @@ public class Service {
                     .role(Role.ADMIN)
                     .build();
 
-//            session.persist(user);
             session.get(User.class, 1);
 
             session.getTransaction().commit();

@@ -12,13 +12,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "cars")
+@Entity
 public class Car {
 
     @Id
@@ -26,12 +26,12 @@ public class Car {
     private Long id;
     private String manufacturer;
     private String model;
-    private int year;
-    private int horsepower;
-    private double price;
-    private boolean isActive;
+    private Integer year;
+    private Integer horsepower;
+    private Double price;
+    private Boolean isActive;
     private Long ownerId;
     @Enumerated(EnumType.STRING)
     private CarType type;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }

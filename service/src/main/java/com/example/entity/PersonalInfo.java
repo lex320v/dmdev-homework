@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "personal_info")
+@Entity
 public class PersonalInfo {
 
     @Id

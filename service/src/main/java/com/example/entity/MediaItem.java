@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import com.example.entity.enums.MediaItemType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,13 +13,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "media_items")
+@Entity
 public class MediaItem {
 
     @Id
@@ -26,9 +27,14 @@ public class MediaItem {
     private Long id;
     @Enumerated(EnumType.STRING)
     private MediaItemType type;
+    @Column(nullable = false)
     private String mimeType;
+    @Column(nullable = false)
     private String previewLink;
+    @Column(nullable = false)
     private String link;
+    @Column(nullable = false)
     private Long uploaderId;
-    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private Instant createdAt;
 }
