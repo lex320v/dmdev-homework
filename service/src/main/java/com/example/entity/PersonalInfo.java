@@ -1,8 +1,11 @@
 package com.example.entity;
 
 import com.example.entity.enums.DriverLicenseCategories;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,16 +22,35 @@ import java.util.List;
 public class PersonalInfo {
 
     @Id
-    private Long userId;
+    @Column(name = "user_id")
+    private Long id;
 
     private String driverLicenseSurname;
+
     private String driverLicenseName;
+
     private LocalDate driverLicenseDateOfBirth;
+
     private String driverLicensePlaceOfBirth;
+
     private LocalDate driverLicenseDateOfIssue;
+
     private LocalDate driverLicenseDateOfExpire;
+
     private String driverLicenseIssuedBy;
+
     private String driverLicenseCode;
+
     private String driverLicenseResidence;
+
     private List<DriverLicenseCategories> driverLicenseCategories;
+
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    private User user;
+
+    public void setUser(User user) {
+        this.user = user;
+        this.id = user.getId();
+    }
 }
