@@ -1,15 +1,11 @@
 package com.example;
 
-import com.example.entity.Car;
-import com.example.entity.Feedback;
-import com.example.entity.MediaItem;
-import com.example.entity.PersonalInfo;
-import com.example.entity.Request;
 import com.example.entity.User;
-import org.hibernate.Session;
+import com.example.entity.enums.Gender;
+import com.example.entity.enums.Role;
+import com.example.entity.enums.UserStatus;
+import com.example.util.HibernateTestUtil;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
-import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,28 +14,36 @@ class FirstTest {
 
     @Test
     public void testDB() {
-        Configuration configuration = new Configuration();
-        configuration.addAnnotatedClass(User.class);
-        configuration.addAnnotatedClass(Car.class);
-        configuration.addAnnotatedClass(Request.class);
-        configuration.addAnnotatedClass(Feedback.class);
-        configuration.addAnnotatedClass(PersonalInfo.class);
-        configuration.addAnnotatedClass(MediaItem.class);
-        configuration.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
-        configuration.configure();
 
-        try (SessionFactory sessionFactory = configuration.buildSessionFactory();
-             Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+        try (SessionFactory sessionFactory = HibernateTestUtil.buildSessionFactory()) {
+            User user = User.builder()
+                    .username("qqqq11")
+                    .password("22")
+                    .status(UserStatus.ACTIVE)
+                    .gender(Gender.MALE)
+                    .role(Role.ADMIN)
+                    .build();
+            User user1 = User.builder()
+                    .username("wwwww2")
+                    .password("22")
+                    .status(UserStatus.ACTIVE)
+                    .gender(Gender.FEMALE)
+                    .role(Role.ADMIN)
+                    .build();
 
-            session.get(User.class, 1);
-            session.get(Car.class, 1);
-            session.get(Request.class, 1);
-            session.get(Feedback.class, 1);
-            session.get(PersonalInfo.class, 1);
-            session.get(MediaItem.class, 1);
+            sessionFactory.inTransaction(session -> {
+                session.persist(user);
+                session.persist(user1);
 
-            session.getTransaction().commit();
+                var savedUser = session.get(User.class, user.getId());
+                var savedUser1 = session.get(User.class, user1.getId());
+
+                System.out.println(user);
+                System.out.println(user1);
+
+                System.out.println(savedUser);
+                System.out.println(savedUser1);
+            });
         }
 
         assertTrue(true);
