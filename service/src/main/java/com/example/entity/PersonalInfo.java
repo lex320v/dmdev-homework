@@ -3,6 +3,8 @@ package com.example.entity;
 import com.example.entity.enums.DriverLicenseCategories;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -25,11 +27,11 @@ public class PersonalInfo {
     @Column(name = "user_id")
     private Long id;
 
+    private LocalDate dateOfBirth;
+
     private String driverLicenseSurname;
 
     private String driverLicenseName;
-
-    private LocalDate driverLicenseDateOfBirth;
 
     private String driverLicensePlaceOfBirth;
 
@@ -43,6 +45,7 @@ public class PersonalInfo {
 
     private String driverLicenseResidence;
 
+    @Enumerated(EnumType.STRING)
     private List<DriverLicenseCategories> driverLicenseCategories;
 
     @OneToOne
@@ -50,6 +53,7 @@ public class PersonalInfo {
     private User user;
 
     public void setUser(User user) {
+        user.setPersonalInfo(this);
         this.user = user;
         this.id = user.getId();
     }

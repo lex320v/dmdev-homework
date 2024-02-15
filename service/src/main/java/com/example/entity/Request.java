@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -38,13 +40,17 @@ public class Request {
     @Column(nullable = false)
     private LocalDateTime dateTimeTo;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
 
     private String comment;
 
-    @Column(nullable = false)
+    @CreationTimestamp
     private Instant createdAt;
+
+    @UpdateTimestamp
+    private Instant updatedAt;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "car_id")

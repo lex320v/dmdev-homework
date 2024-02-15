@@ -12,12 +12,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,7 +28,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = "owner")
+@ToString(exclude = {"owner", "carToMediaItems"})
+@EqualsAndHashCode(exclude = {"owner", "carToMediaItems"})
 @Entity
 public class Car {
 
@@ -50,19 +53,17 @@ public class Car {
     private Double price;
 
     @Column(nullable = false)
-    private Boolean isActive;
+    private Boolean active;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CarType type;
 
-    @Column(nullable = false)
+    @CreationTimestamp
     private Instant createdAt;
 
-    @PrePersist
-    private void init() {
-        createdAt = Instant.now();
-    }
+    @UpdateTimestamp
+    private Instant updatedAt;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")

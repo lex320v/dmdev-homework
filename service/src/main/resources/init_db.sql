@@ -15,14 +15,15 @@ CREATE TABLE users
     status               VARCHAR(20) CHECK (status IN ('ACTIVE', 'INACTIVE'))                    NOT NULL,
     username             VARCHAR(255) UNIQUE                                                     NOT NULL,
     password             VARCHAR(255)                                                            NOT NULL,
-    firstname            VARCHAR(255),
-    lastname             VARCHAR(255),
+    firstname            VARCHAR(255)                                                            NOT NULL,
+    lastname             VARCHAR(255)                                                            NOT NULL,
     gender               VARCHAR(20) CHECK (gender IN ('MALE', 'FEMALE'))                        NOT NULL,
     role                 VARCHAR(20) CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'OWNER', 'CLIENT')) NOT NULL,
     avatar_media_item_id BIGINT UNIQUE REFERENCES media_item (id) ON DELETE SET NULL,
-    birth_date           DATE,
-    deleted_at           TIMESTAMP(6),
-    created_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL
+    deleted_at           TIMESTAMP(6) DEFAULT NOW(),
+    created_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL,
+    updated_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL
+
 );
 
 ALTER TABLE media_item
@@ -32,7 +33,7 @@ ALTER TABLE media_item
 CREATE TABLE personal_info
 (
     user_id                       BIGINT PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE NOT NULL,
-    driver_license_date_of_birth  DATE,
+    date_of_birth                 DATE,
     driver_license_date_of_expire DATE,
     driver_license_date_of_issue  DATE,
     driver_license_code           VARCHAR(255),
@@ -41,7 +42,7 @@ CREATE TABLE personal_info
     driver_license_place_of_birth VARCHAR(255),
     driver_license_residence      VARCHAR(255),
     driver_license_surname        VARCHAR(255),
-    driver_license_categories     SMALLINT ARRAY
+    driver_license_categories     VARCHAR(2) ARRAY
 );
 
 CREATE TABLE car
@@ -52,17 +53,18 @@ CREATE TABLE car
     type         VARCHAR(20) CHECK (type IN ('SEDAN', 'CROSSOVER', 'HATCHBACK', 'PICKUP', 'SPORT_CAR')) NOT NULL,
     year         INTEGER                                                                                NOT NULL,
     horsepower   INTEGER                                                                                NOT NULL,
-    is_active    BOOLEAN                                                                                NOT NULL,
+    active       BOOLEAN                                                                                NOT NULL,
     price        FLOAT(53)                                                                              NOT NULL,
     owner_id     BIGINT REFERENCES users (id) ON DELETE CASCADE                                         NOT NULL,
-    created_at   TIMESTAMP(6) DEFAULT NOW()                                                             NOT NULL
+    created_at   TIMESTAMP(6) DEFAULT NOW()                                                             NOT NULL,
+    updated_at   TIMESTAMP(6) DEFAULT NOW()                                                             NOT NULL
 );
 
 CREATE TABLE car_to_media_item
 (
     car_id        BIGINT REFERENCES car (id) ON DELETE CASCADE        NOT NULL,
     media_item_id BIGINT REFERENCES media_item (id) ON DELETE CASCADE NOT NULL,
-    position INTEGER NOT NULL,
+    position      INTEGER                                             NOT NULL,
     PRIMARY KEY (car_id, media_item_id)
 );
 
@@ -75,7 +77,8 @@ CREATE TABLE request
     client_id      BIGINT REFERENCES users (id)                                               NOT NULL,
     date_time_from TIMESTAMP(6)                                                               NOT NULL,
     date_time_to   TIMESTAMP(6)                                                               NOT NULL,
-    created_at     TIMESTAMP(6) DEFAULT NOW()                                                 NOT NULL
+    created_at     TIMESTAMP(6) DEFAULT NOW()                                                 NOT NULL,
+    updated_at     TIMESTAMP(6) DEFAULT NOW()                                                 NOT NULL
 );
 
 CREATE TABLE feedback
@@ -84,7 +87,9 @@ CREATE TABLE feedback
     rating     INTEGER                        NOT NULL,
     text       VARCHAR(255),
     request_id BIGINT REFERENCES request (id) NOT NULL,
-    created_at TIMESTAMP(6) DEFAULT NOW()     NOT NULL
+    deleted_at TIMESTAMP(6) DEFAULT NOW(),
+    created_at TIMESTAMP(6) DEFAULT NOW()     NOT NULL,
+    updated_at TIMESTAMP(6) DEFAULT NOW()     NOT NULL
 );
 
 

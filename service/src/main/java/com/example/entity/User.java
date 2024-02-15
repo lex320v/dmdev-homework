@@ -3,6 +3,7 @@ package com.example.entity;
 import com.example.entity.enums.Gender;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,22 +14,27 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = "cars")
+@ToString(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems"})
+@EqualsAndHashCode(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems"})
 @Entity(name = "users")
 public class User {
 
@@ -42,11 +48,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private String firstname;
 
+    @Column(nullable = false)
     private String lastname;
-
-    private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -61,31 +67,46 @@ public class User {
 
     private Instant deletedAt;
 
-    @Column(nullable = false)
+    @CreationTimestamp
     private Instant createdAt;
 
-    @PrePersist
-    private void init() {
-        createdAt = Instant.now();
-    }
+    @UpdateTimestamp
+    private Instant updatedAt;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private PersonalInfo personalInfo;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "avatar_media_item_id")
     private MediaItem avatarMediaItem;
 
     public void setAvatar(MediaItem mediaItem) {
-        mediaItem.setUser(this);
-        this.avatarMediaItem = mediaItem;
+        if (mediaItem != null) {
+            mediaItem.setUserAvatar(this);
+            this.avatarMediaItem = mediaItem;
+        } else {
+            this.avatarMediaItem = null;
+        }
     }
 
-    @OneToMany(mappedBy = "uploader")
-    private List<MediaItem> mediaItems;
+    @Builder.Default
+    @OneToMany(mappedBy = "uploader", cascade = CascadeType.ALL)
+    private List<MediaItem> mediaItems = new ArrayList<>();
 
-    @OneToMany(mappedBy = "owner")
-    private List<Car> cars;
+    public void addMediaItem(MediaItem mediaItem) {
+        mediaItems.add(mediaItem);
+        mediaItem.setUploader(this);
+    }
+
+    @Builder.Default
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Car> cars = new ArrayList<>();
+
+    public void addCar(Car car) {
+        cars.add(car);
+        car.setOwner(this);
+    }
 
     @OneToMany(mappedBy = "client")
     private List<Request> requests;

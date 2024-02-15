@@ -16,7 +16,10 @@ import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.util.List;
@@ -25,6 +28,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"carToMediaItems"})
+@EqualsAndHashCode(exclude = {"carToMediaItems"})
 @Entity
 public class MediaItem {
 
@@ -32,24 +37,24 @@ public class MediaItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private MediaItemType type;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String mimeType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String previewLink;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String link;
 
-    @Column(nullable = false)
+    @CreationTimestamp
     private Instant createdAt;
 
     @OneToOne(mappedBy = "avatarMediaItem")
-    private User user;
+    private User userAvatar;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "uploader_id")

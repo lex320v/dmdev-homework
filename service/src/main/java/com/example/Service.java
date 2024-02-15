@@ -5,10 +5,11 @@ import com.example.entity.enums.Gender;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
 import com.example.util.HibernateUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
+@Slf4j
 public class Service {
 
     private final static Common common = new Common();
@@ -18,32 +19,36 @@ public class Service {
         try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
              Session session = sessionFactory.openSession()
         ) {
-            Transaction transaction = session.beginTransaction();
+            session.beginTransaction();
 
-            User user = User.builder()
-                    .username("qqqq11")
-                    .password("22")
+//            User user = session.get(User.class, 30);
+//            PersonalInfo personalInfo = PersonalInfo.builder()
+//                    .driverLicenseSurname("qqq")
+//                    .driverLicenseName("www")
+//                    .driverLicenseDateOfBirth(LocalDate.of(2000, 5, 5))
+//                    .driverLicensePlaceOfBirth("qqq")
+//                    .driverLicenseDateOfIssue(LocalDate.of(2000, 5, 5))
+//                    .driverLicenseDateOfExpire(LocalDate.of(2000, 5, 5))
+//                    .driverLicenseIssuedBy("qqqq")
+//                    .driverLicenseCode("123 123")
+//                    .driverLicenseResidence("eeee")
+//                    .driverLicenseCategories(List.of(DriverLicenseCategories.A, DriverLicenseCategories.B, DriverLicenseCategories.B1))
+//                    .build();
+            User user1 = User.builder()
+                    .username("lex1")
+                    .firstname("firstname_lex")
+                    .lastname("lastname_lex")
+                    .password("qwerty")
                     .status(UserStatus.ACTIVE)
                     .gender(Gender.MALE)
-                    .role(Role.ADMIN)
-                    .build();
-            User user1 = User.builder()
-                    .username("wwwww2")
-                    .password("22")
-                    .status(UserStatus.ACTIVE)
-                    .gender(Gender.FEMALE)
-                    .role(Role.ADMIN)
+                    .role(Role.SUPER_ADMIN)
                     .build();
 
-            try {
-                session.persist(user);
-                if (true) throw new RuntimeException();
-                session.persist(user1);
+            session.persist(user1);
+//            personalInfo.setUser(user1);
 
-                transaction.commit();
-            } catch (RuntimeException exception) {
-                transaction.rollback();
-            }
+            session.getTransaction().commit();
+
         }
     }
 }
