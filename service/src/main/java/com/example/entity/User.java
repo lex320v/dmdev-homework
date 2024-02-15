@@ -20,10 +20,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -33,10 +31,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems"})
-@EqualsAndHashCode(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems"})
+@ToString(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems"}, callSuper = true)
+@EqualsAndHashCode(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems"}, callSuper = false)
 @Entity(name = "users")
-public class User {
+public class User extends AuditableEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,12 +64,6 @@ public class User {
     private UserStatus status;
 
     private Instant deletedAt;
-
-    @CreationTimestamp
-    private Instant createdAt;
-
-    @UpdateTimestamp
-    private Instant updatedAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private PersonalInfo personalInfo;
