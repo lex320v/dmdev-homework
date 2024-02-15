@@ -14,11 +14,13 @@ import java.time.Instant;
 @Setter
 @Getter
 @MappedSuperclass
-public abstract class AuditableEntity<T extends Serializable> implements BaseEntity<T> {
+public abstract class BaseEntitySoftDelete<T extends Serializable> implements BaseEntityId<T>  {
 
     @CreationTimestamp
     private Instant createdAt;
 
     @UpdateTimestamp
     private Instant updatedAt;
+
+    private Instant deletedAt;
 }

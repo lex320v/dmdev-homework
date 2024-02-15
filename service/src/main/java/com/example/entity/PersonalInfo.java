@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-public class PersonalInfo {
+public class PersonalInfo implements BaseEntityId<Long> {
 
     @Id
     @Column(name = "user_id")

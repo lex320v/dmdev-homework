@@ -1,10 +1,24 @@
 package com.example.entity;
 
+import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.io.Serializable;
+import java.time.Instant;
 
-public interface BaseEntity<T extends Serializable> {
+@ToString
+@Setter
+@Getter
+@MappedSuperclass
+public abstract class BaseEntity<T extends Serializable> implements BaseEntityId<T> {
 
-    void setId(T id);
+    @CreationTimestamp
+    private Instant createdAt;
 
-    T getId();
+    @UpdateTimestamp
+    private Instant updatedAt;
 }

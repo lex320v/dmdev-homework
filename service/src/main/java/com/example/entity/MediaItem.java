@@ -19,9 +19,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -29,9 +27,9 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @ToString(exclude = {"carToMediaItems"})
-@EqualsAndHashCode(exclude = {"carToMediaItems"})
+@EqualsAndHashCode(exclude = {"carToMediaItems"}, callSuper = false)
 @Entity
-public class MediaItem {
+public class MediaItem extends BaseEntity<Long>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,9 +47,6 @@ public class MediaItem {
 
     @Column(nullable = false, updatable = false)
     private String link;
-
-    @CreationTimestamp
-    private Instant createdAt;
 
     @OneToOne(mappedBy = "avatarMediaItem")
     private User userAvatar;

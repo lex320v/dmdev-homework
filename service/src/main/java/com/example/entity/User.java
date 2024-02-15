@@ -23,7 +23,6 @@ import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +33,7 @@ import java.util.List;
 @ToString(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems"}, callSuper = true)
 @EqualsAndHashCode(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems"}, callSuper = false)
 @Entity(name = "users")
-public class User extends AuditableEntity<Long> {
+public class User extends BaseEntitySoftDelete<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,8 +61,6 @@ public class User extends AuditableEntity<Long> {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status;
-
-    private Instant deletedAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private PersonalInfo personalInfo;
