@@ -8,6 +8,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,8 +31,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems"}, callSuper = true)
-@EqualsAndHashCode(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems"}, callSuper = false)
+@ToString(exclude = {"avatarMediaItem", "cars", "mediaItems", "requests"}, callSuper = true)
+@EqualsAndHashCode(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems", "requests"}, callSuper = false)
 @Entity(name = "users")
 public class User extends BaseEntitySoftDelete<Long> {
 
@@ -62,21 +63,16 @@ public class User extends BaseEntitySoftDelete<Long> {
     @Column(nullable = false)
     private UserStatus status;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private PersonalInfo personalInfo;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "avatar_media_item_id")
     private MediaItem avatarMediaItem;
 
     public void setAvatar(MediaItem mediaItem) {
-        if (mediaItem != null) {
-            mediaItem.setUserAvatar(this);
-            this.avatarMediaItem = mediaItem;
-        } else {
-            this.avatarMediaItem = null;
-        }
+        this.avatarMediaItem = mediaItem;
     }
 
     @Builder.Default
@@ -97,6 +93,12 @@ public class User extends BaseEntitySoftDelete<Long> {
         car.setOwner(this);
     }
 
-    @OneToMany(mappedBy = "client")
-    private List<Request> requests;
+    @Builder.Default
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    private List<Request> requests = new ArrayList<>();
+
+    public void addRequest(Request request) {
+        requests.add(request);
+        request.setClient(this);
+    }
 }

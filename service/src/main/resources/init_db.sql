@@ -6,7 +6,9 @@ CREATE TABLE media_item
     uploader_id  BIGINT                                                           NOT NULL,
     link         VARCHAR(255)                                                     NOT NULL,
     preview_link VARCHAR(255),
-    created_at   TIMESTAMP(6) DEFAULT NOW()                                       NOT NULL
+    created_at   TIMESTAMP(6) DEFAULT NOW()                                       NOT NULL,
+    updated_at   TIMESTAMP(6) DEFAULT NOW()                                       NOT NULL
+
 );
 
 CREATE TABLE users

@@ -12,7 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,9 +46,6 @@ public class MediaItem extends BaseEntity<Long>{
 
     @Column(nullable = false, updatable = false)
     private String link;
-
-    @OneToOne(mappedBy = "avatarMediaItem")
-    private User userAvatar;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "uploader_id")
