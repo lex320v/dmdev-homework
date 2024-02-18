@@ -1,6 +1,7 @@
 package com.example;
 
 import com.example.entity.Car;
+import com.example.entity.Feedback;
 import com.example.entity.Request;
 import com.example.entity.User;
 import com.example.entity.enums.CarType;
@@ -21,8 +22,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class RequestTest {
-
+class FeedbackIT {
     static SessionFactory sessionFactory;
     static Session session;
 
@@ -38,61 +38,72 @@ class RequestTest {
     }
 
     @Test
-    void createAndGetRequest() {
+    void createAndGetFeedback() {
         var user = buildUser();
-        var car = buildCar(user);
-        var request = buildRequest(user, car);
+        var car = buildCar();
+        user.addCar(car);
+
+        var request = buildRequest();
+        car.addRequest(request, user);
+
+        var feedback = buildFeedback();
+        request.addFeedback(feedback);
 
         session.persist(user);
-        session.persist(car);
-        session.persist(request);
-        session.evict(request);
 
-        Request requestFromDb = session.get(Request.class, request.getId());
+        var feedbackFromDb = session.get(Feedback.class, feedback.getId());
 
-        assertThat(requestFromDb).isNotNull();
+        assertThat(feedbackFromDb).isNotNull();
     }
 
     @Test
-    void updateRequest() {
+    void updateFeedback() {
         var user = buildUser();
-        var car = buildCar(user);
-        var request = buildRequest(user, car);
+        var car = buildCar();
+        user.addCar(car);
 
-        var updatedDateTime = LocalDateTime.now();
-        var updatedStatus = RequestStatus.REJECTED;
-        var updatedString = "updated value";
+        var request = buildRequest();
+        car.addRequest(request, user);
+
+        var feedback = buildFeedback();
+        request.addFeedback(feedback);
+
+        var updatedString = "updated string";
+        var updatedInteger = 10;
 
         session.persist(user);
-        session.persist(car);
-        session.persist(request);
 
-        request.setDateTimeFrom(updatedDateTime);
-        request.setDateTimeTo(updatedDateTime);
-        request.setStatus(updatedStatus);
-        request.setComment(updatedString);
+        feedback.setText(updatedString);
+        feedback.setRating(updatedInteger);
         session.flush();
 
-        assertThat(request.getDateTimeFrom()).isEqualTo(updatedDateTime);
-        assertThat(request.getDateTimeTo()).isEqualTo(updatedDateTime);
-        assertThat(request.getStatus()).isEqualTo(updatedStatus);
-        assertThat(request.getComment()).isEqualTo(updatedString);
+        var feedbackFromDb = session.get(Feedback.class, feedback.getId());
+
+        assertThat(feedbackFromDb.getText()).isEqualTo(updatedString);
+        assertThat(feedbackFromDb.getRating()).isEqualTo(updatedInteger);
     }
 
     @Test
-    void deleteRequest() {
+    void deleteFeedback() {
         var user = buildUser();
-        var car = buildCar(user);
-        var request = buildRequest(user, car);
+        var car = buildCar();
+        user.addCar(car);
+
+        var request = buildRequest();
+        car.addRequest(request, user);
+
+        var feedback = buildFeedback();
+        request.addFeedback(feedback);
 
         session.persist(user);
-        session.persist(car);
-        session.persist(request);
-        session.remove(request);
+        request.getFeedbacks().remove(feedback);
 
-        Request requestFromDb = session.get(Request.class, request.getId());
+        session.remove(feedback);
+        session.flush();
 
-        assertThat(requestFromDb).isNull();
+        var feedbackFromDb = session.get(Feedback.class, feedback.getId());
+
+        assertThat(feedbackFromDb).isNull();
     }
 
     @AfterEach
@@ -118,7 +129,7 @@ class RequestTest {
                 .build();
     }
 
-    private Car buildCar(User user) {
+    private Car buildCar() {
         return Car.builder()
                 .manufacturer("manufacturer")
                 .model("model")
@@ -127,17 +138,22 @@ class RequestTest {
                 .price(20.4)
                 .active(true)
                 .type(CarType.SEDAN)
-                .owner(user)
                 .build();
     }
 
-    private Request buildRequest(User client, Car car) {
+    private Request buildRequest() {
         return Request.builder()
                 .dateTimeFrom(LocalDateTime.now())
                 .dateTimeTo(LocalDateTime.now().plusHours(8))
-                .client(client)
-                .car(car)
                 .status(RequestStatus.OPEN)
                 .build();
+    }
+
+    private Feedback buildFeedback() {
+        return Feedback.builder()
+                .rating(5)
+                .text("text")
+                .build();
+
     }
 }

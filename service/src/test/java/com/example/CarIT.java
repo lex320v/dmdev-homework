@@ -25,7 +25,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CarTest {
+class CarIT {
 
     static SessionFactory sessionFactory;
     static Session session;
