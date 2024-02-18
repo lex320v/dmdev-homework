@@ -79,6 +79,7 @@ class CarTest {
             car.setType(updatedType);
 
             session.flush();
+            session.evict(car);
 
             var carFromDb = session.get(Car.class, car.getId());
 

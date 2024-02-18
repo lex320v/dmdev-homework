@@ -46,6 +46,7 @@ class RequestTest {
         session.persist(user);
         session.persist(car);
         session.persist(request);
+        session.evict(request);
 
         Request requestFromDb = session.get(Request.class, request.getId());
 

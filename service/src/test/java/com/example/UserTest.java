@@ -56,6 +56,7 @@ class UserTest {
             var user = buildUser();
 
             session.persist(user);
+            session.evict(user);
 
             User userFromDb = session.get(User.class, user.getId());
 
@@ -123,6 +124,7 @@ class UserTest {
             session.persist(user);
             personalInfo.setUser(user);
             session.flush();
+            session.evict(personalInfo);
 
             session.get(PersonalInfo.class, personalInfo.getId());
 
@@ -194,6 +196,7 @@ class UserTest {
             session.persist(user);
             user.setAvatar(avatar);
             session.flush();
+            session.evict(user);
 
             var userWithAvatar = session.get(User.class, user.getId());
 
@@ -207,10 +210,12 @@ class UserTest {
             var updated_avatar = buildMediaItem();
 
             session.persist(user);
+
             user.setAvatar(avatar);
             session.flush();
-
             user.setAvatar(updated_avatar);
+            session.flush();
+
             session.remove(avatar);
 
             var userWithAvatar = session.get(User.class, user.getId());
