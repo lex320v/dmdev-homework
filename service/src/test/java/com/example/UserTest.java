@@ -12,6 +12,8 @@ import com.example.util.HibernateTestUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,24 +26,27 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class UserTest {
 
-    SessionFactory sessionFactory;
-    Session openedSession;
+    static SessionFactory sessionFactory;
+    static Session session;
+
+    @BeforeAll
+    static void init() {
+        sessionFactory = HibernateTestUtil.buildSessionFactory();
+        session = sessionFactory.openSession();
+    }
 
     @BeforeEach
     public void prepare() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
-        openedSession = sessionFactory.openSession();
+        session.beginTransaction();
     }
 
     @Nested
-    class userCRUD {
+    class UserCRUD {
         @Test
         void createUser() {
             var user = buildUser();
 
-            openedSession.beginTransaction();
-            openedSession.persist(user);
-            openedSession.getTransaction().commit();
+            session.persist(user);
 
             assertNotNull(user.getId());
         }
@@ -50,10 +55,9 @@ class UserTest {
         void readUser() {
             var user = buildUser();
 
-            openedSession.beginTransaction();
-            openedSession.persist(user);
-            openedSession.getTransaction().commit();
-            User userFromDb = openedSession.get(User.class, user.getId());
+            session.persist(user);
+
+            User userFromDb = session.get(User.class, user.getId());
 
             assertThat(userFromDb).isEqualTo(user);
         }
@@ -66,16 +70,15 @@ class UserTest {
             var updatedGender = Gender.FEMALE;
             var updatedRole = Role.CLIENT;
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
+            session.persist(user);
 
-                user.setUsername(updatedString);
-                user.setFirstname(updatedString);
-                user.setLastname(updatedString);
-                user.setGender(updatedGender);
-                user.setRole(updatedRole);
-                user.setPassword(updatedString);
-            });
+            user.setUsername(updatedString);
+            user.setFirstname(updatedString);
+            user.setLastname(updatedString);
+            user.setGender(updatedGender);
+            user.setRole(updatedRole);
+            user.setPassword(updatedString);
+            session.flush();
 
             assertThat(user.getUsername()).isEqualTo(updatedString);
             assertThat(user.getFirstname()).isEqualTo(updatedString);
@@ -89,28 +92,25 @@ class UserTest {
         void deleteUser() {
             User user = buildUser();
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
-                session.remove(user);
-            });
+            session.persist(user);
+            session.remove(user);
 
-            User userFromDb = openedSession.get(User.class, user.getId());
+            User userFromDb = session.get(User.class, user.getId());
 
             assertThat(userFromDb).isNull();
         }
     }
 
     @Nested
-    class personalInfoCRUD {
+    class PersonalInfoCRUD {
         @Test
         void createPersonalInfo() {
             PersonalInfo personalInfo = buildPersonalInfo();
             User user = buildUser();
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
-                personalInfo.setUser(user);
-            });
+            session.persist(user);
+            personalInfo.setUser(user);
+            session.flush();
 
             assertThat(personalInfo.getId()).isNotNull();
         }
@@ -120,14 +120,12 @@ class UserTest {
             PersonalInfo personalInfo = buildPersonalInfo();
             User user = buildUser();
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
-                personalInfo.setUser(user);
-            });
+            session.persist(user);
+            personalInfo.setUser(user);
+            session.flush();
 
-            openedSession.get(PersonalInfo.class, personalInfo.getId());
+            session.get(PersonalInfo.class, personalInfo.getId());
 
-            System.out.println(personalInfo);
             assertThat(personalInfo).isNotNull();
         }
 
@@ -140,21 +138,21 @@ class UserTest {
             var updatedDate = LocalDate.of(2012, 12, 12);
             var updatedCategories = List.of(DriverLicenseCategories.M, DriverLicenseCategories.B);
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
-                personalInfo.setUser(user);
+            session.persist(user);
+            personalInfo.setUser(user);
 
-                personalInfo.setDriverLicenseName(updatedString);
-                personalInfo.setDriverLicenseSurname(updatedString);
-                personalInfo.setDriverLicensePlaceOfBirth(updatedString);
-                personalInfo.setDriverLicenseIssuedBy(updatedString);
-                personalInfo.setDriverLicenseCode(updatedString);
-                personalInfo.setDriverLicenseResidence(updatedString);
-                personalInfo.setDateOfBirth(updatedDate);
-                personalInfo.setDriverLicenseDateOfIssue(updatedDate);
-                personalInfo.setDriverLicenseDateOfExpire(updatedDate);
-                personalInfo.setDriverLicenseCategories(updatedCategories);
-            });
+            personalInfo.setDriverLicenseName(updatedString);
+            personalInfo.setDriverLicenseSurname(updatedString);
+            personalInfo.setDriverLicensePlaceOfBirth(updatedString);
+            personalInfo.setDriverLicenseIssuedBy(updatedString);
+            personalInfo.setDriverLicenseCode(updatedString);
+            personalInfo.setDriverLicenseResidence(updatedString);
+            personalInfo.setDateOfBirth(updatedDate);
+            personalInfo.setDriverLicenseDateOfIssue(updatedDate);
+            personalInfo.setDriverLicenseDateOfExpire(updatedDate);
+            personalInfo.setDriverLicenseCategories(updatedCategories);
+            session.flush();
+
 
             assertThat(personalInfo.getDriverLicenseName()).isEqualTo(updatedString);
             assertThat(personalInfo.getDriverLicenseSurname()).isEqualTo(updatedString);
@@ -173,34 +171,31 @@ class UserTest {
             User user = buildUser();
             PersonalInfo personalInfo = buildPersonalInfo();
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
-                personalInfo.setId(user.getId());
-                session.persist(personalInfo);
-                session.remove(personalInfo);
-            });
+            session.persist(user);
+            personalInfo.setUser(user);
+            session.flush();
+            user.setPersonalInfo(null);
+            session.remove(personalInfo);
 
-            PersonalInfo personalInfoFromDb = openedSession.get(PersonalInfo.class, personalInfo.getId());
+            PersonalInfo personalInfoFromDb = session.get(PersonalInfo.class, personalInfo.getId());
 
             assertThat(personalInfoFromDb).isNull();
         }
     }
 
     @Nested
-    class avatarCRUD {
+    class AvatarCRUD {
 
         @Test
         void createAndGetAvatar() {
             var user = buildUser();
             var avatar = buildMediaItem();
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
-                avatar.setUploader(user);
-                user.setAvatar(avatar);
-            });
+            session.persist(user);
+            user.setAvatar(avatar);
+            session.flush();
 
-            var userWithAvatar = openedSession.get(User.class, user.getId());
+            var userWithAvatar = session.get(User.class, user.getId());
 
             assertThat(userWithAvatar.getAvatarMediaItem()).isNotNull();
         }
@@ -211,18 +206,14 @@ class UserTest {
             var avatar = buildMediaItem();
             var updated_avatar = buildMediaItem();
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
-                avatar.setUploader(user);
-                user.setAvatar(avatar);
-                session.flush();
+            session.persist(user);
+            user.setAvatar(avatar);
+            session.flush();
 
-                updated_avatar.setUploader(user);
-                user.setAvatar(updated_avatar);
-                session.remove(avatar);
-            });
+            user.setAvatar(updated_avatar);
+            session.remove(avatar);
 
-            var userWithAvatar = openedSession.get(User.class, user.getId());
+            var userWithAvatar = session.get(User.class, user.getId());
 
             assertThat(userWithAvatar.getAvatarMediaItem().getId()).isNotEqualTo(avatar.getId());
         }
@@ -232,17 +223,14 @@ class UserTest {
             var user = buildUser();
             var avatar = buildMediaItem();
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
-                avatar.setUploader(user);
-                user.setAvatar(avatar);
-                session.flush();
+            session.persist(user);
+            user.setAvatar(avatar);
+            session.flush();
 
-                user.setAvatar(null);
-                session.remove(avatar);
-            });
+            user.setAvatar(null);
+            session.remove(avatar);
 
-            var userWithAvatar = openedSession.get(User.class, user.getId());
+            var userWithAvatar = session.get(User.class, user.getId());
 
             assertThat(userWithAvatar.getAvatarMediaItem()).isNull();
         }
@@ -250,7 +238,12 @@ class UserTest {
 
     @AfterEach
     void closeConnection() {
-        openedSession.close();
+        session.getTransaction().rollback();
+    }
+
+    @AfterAll
+    static void closeSessionFactory() {
+        session.close();
         sessionFactory.close();
     }
 

@@ -12,6 +12,8 @@ import com.example.util.HibernateTestUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,13 +23,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class RequestTest {
 
-    SessionFactory sessionFactory;
-    Session openedSession;
+    static SessionFactory sessionFactory;
+    static Session session;
+
+    @BeforeAll
+    static void init() {
+        sessionFactory = HibernateTestUtil.buildSessionFactory();
+        session = sessionFactory.openSession();
+    }
 
     @BeforeEach
-    void prepare() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
-        openedSession = sessionFactory.openSession();
+    public void prepare() {
+        session.beginTransaction();
     }
 
     @Test
@@ -36,13 +43,11 @@ class RequestTest {
         var car = buildCar(user);
         var request = buildRequest(user, car);
 
-        sessionFactory.inTransaction(session -> {
-            session.persist(user);
-            session.persist(car);
-            session.persist(request);
-        });
+        session.persist(user);
+        session.persist(car);
+        session.persist(request);
 
-        Request requestFromDb = openedSession.get(Request.class, request.getId());
+        Request requestFromDb = session.get(Request.class, request.getId());
 
         assertThat(requestFromDb).isNotNull();
     }
@@ -57,16 +62,15 @@ class RequestTest {
         var updatedStatus = RequestStatus.REJECTED;
         var updatedString = "updated value";
 
-        sessionFactory.inTransaction(session -> {
-            session.persist(user);
-            session.persist(car);
-            session.persist(request);
+        session.persist(user);
+        session.persist(car);
+        session.persist(request);
 
-            request.setDateTimeFrom(updatedDateTime);
-            request.setDateTimeTo(updatedDateTime);
-            request.setStatus(updatedStatus);
-            request.setComment(updatedString);
-        });
+        request.setDateTimeFrom(updatedDateTime);
+        request.setDateTimeTo(updatedDateTime);
+        request.setStatus(updatedStatus);
+        request.setComment(updatedString);
+        session.flush();
 
         assertThat(request.getDateTimeFrom()).isEqualTo(updatedDateTime);
         assertThat(request.getDateTimeTo()).isEqualTo(updatedDateTime);
@@ -80,21 +84,24 @@ class RequestTest {
         var car = buildCar(user);
         var request = buildRequest(user, car);
 
-        sessionFactory.inTransaction(session -> {
-            session.persist(user);
-            session.persist(car);
-            session.persist(request);
-            session.remove(request);
-        });
+        session.persist(user);
+        session.persist(car);
+        session.persist(request);
+        session.remove(request);
 
-        Request requestFromDb = openedSession.get(Request.class, request.getId());
+        Request requestFromDb = session.get(Request.class, request.getId());
 
         assertThat(requestFromDb).isNull();
     }
 
     @AfterEach
     void closeConnection() {
-        openedSession.close();
+        session.getTransaction().rollback();
+    }
+
+    @AfterAll
+    static void closeSessionFactory() {
+        session.close();
         sessionFactory.close();
     }
 

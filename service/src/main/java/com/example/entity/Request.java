@@ -1,11 +1,11 @@
 package com.example.entity;
 
 import com.example.entity.enums.RequestStatus;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,19 +16,21 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-public class Request {
+public class Request extends BaseEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,20 +48,20 @@ public class Request {
 
     private String comment;
 
-    @CreationTimestamp
-    private Instant createdAt;
-
-    @UpdateTimestamp
-    private Instant updatedAt;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "car_id")
     private Car car;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "client_id")
     private User client;
 
-    @OneToMany(mappedBy = "request")
-    private List<Feedback> feedbacks;
+    @Builder.Default
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
+    private List<Feedback> feedbacks = new ArrayList<>();
+
+    public void addFeedback(Feedback feedback) {
+        feedbacks.add(feedback);
+        feedback.setRequest(this);
+    }
 }

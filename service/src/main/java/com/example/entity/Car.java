@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import com.example.entity.enums.CarType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,16 +23,17 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"owner", "carToMediaItems"})
-@EqualsAndHashCode(exclude = {"owner", "carToMediaItems"})
+@ToString(exclude = {"carToMediaItems", "requests"}, callSuper = true)
+@EqualsAndHashCode(exclude = {"carToMediaItems", "requests"}, callSuper = true)
 @Entity
-public class Car {
+public class Car extends BaseEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,19 +61,21 @@ public class Car {
     @Column(nullable = false)
     private CarType type;
 
-    @CreationTimestamp
-    private Instant createdAt;
-
-    @UpdateTimestamp
-    private Instant updatedAt;
-
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @OneToMany(mappedBy = "car")
-    private List<Request> requests;
+    @Builder.Default
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    private List<Request> requests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "car")
-    private List<CarToMediaItem> carToMediaItems;
+    public void addRequest(Request request, User creator) {
+        request.setClient(creator);
+        request.setCar(this);
+        requests.add(request);
+    }
+
+    @Builder.Default
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    private List<CarToMediaItem> carToMediaItems = new ArrayList<>();
 }

@@ -12,8 +12,10 @@ import com.example.entity.enums.UserStatus;
 import com.example.util.HibernateTestUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,17 +27,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CarTest {
 
-    SessionFactory sessionFactory;
-    Session openedSession;
+    static SessionFactory sessionFactory;
+    static Session session;
+
+    @BeforeAll
+    static void init() {
+        sessionFactory = HibernateTestUtil.buildSessionFactory();
+        session = sessionFactory.openSession();
+    }
 
     @BeforeEach
     public void prepare() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
-        openedSession = sessionFactory.openSession();
+        session.beginTransaction();
     }
 
     @Nested
-    class carCRUD {
+    class CarCRUD {
 
         @Test
         void createAndGetCar() {
@@ -43,9 +50,9 @@ class CarTest {
             var car = buildCar();
             user.addCar(car);
 
-            sessionFactory.inTransaction(session -> session.persist(user));
+            session.persist(user);
 
-            var carFromDb = openedSession.get(Car.class, car.getId());
+            var carFromDb = session.get(Car.class, car.getId());
 
             assertThat(carFromDb).isNotNull();
         }
@@ -62,18 +69,18 @@ class CarTest {
             var updatedBoolean = false;
             var updatedType = CarType.CROSSOVER;
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
-                car.setManufacturer(updatedString);
-                car.setModel(updatedString);
-                car.setYear(updatedInteger);
-                car.setHorsepower(updatedInteger);
-                car.setPrice(updatedDouble);
-                car.setActive(updatedBoolean);
-                car.setType(updatedType);
-            });
+            session.persist(user);
+            car.setManufacturer(updatedString);
+            car.setModel(updatedString);
+            car.setYear(updatedInteger);
+            car.setHorsepower(updatedInteger);
+            car.setPrice(updatedDouble);
+            car.setActive(updatedBoolean);
+            car.setType(updatedType);
 
-            var carFromDb = openedSession.get(Car.class, car.getId());
+            session.flush();
+
+            var carFromDb = session.get(Car.class, car.getId());
 
             assertThat(carFromDb.getManufacturer()).isEqualTo(updatedString);
             assertThat(carFromDb.getModel()).isEqualTo(updatedString);
@@ -90,20 +97,18 @@ class CarTest {
             var car = buildCar();
             user.addCar(car);
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
-                user.getCars().remove(car);
-                session.remove(car);
-            });
+            session.persist(user);
+            user.getCars().remove(car);
+            session.remove(car);
 
-            var carFromDb = openedSession.get(Car.class, car.getId());
+            var carFromDb = session.get(Car.class, car.getId());
 
             assertThat(carFromDb).isNull();
         }
     }
 
     @Nested
-    class carMediaItems {
+    class CarMediaItemsCRUD {
         @Test
         void createAndGetMediaItems() {
             var user = buildUser();
@@ -114,35 +119,24 @@ class CarTest {
             var image2 = buildMediaItem(MediaItemType.CAR_IMAGE, user);
             var video = buildMediaItem(MediaItemType.CAR_VIDEO, user);
 
-            var carToMediaItem1 = CarToMediaItem.builder()
-                    .car(car)
-                    .mediaItem(image1)
-                    .position(1)
-                    .build();
-            var carToMediaItem2 = CarToMediaItem.builder()
-                    .car(car)
-                    .mediaItem(image2)
-                    .position(2)
-                    .build();
-            var carToMediaItem3 = CarToMediaItem.builder()
-                    .car(car)
-                    .mediaItem(video)
-                    .position(1)
-                    .build();
+            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
+            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
+            var carToMediaItem3 = buildCarToMediaItem(car, video, 1);
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
+            session.persist(user);
 
-                session.persist(image1);
-                session.persist(image2);
-                session.persist(video);
+            session.persist(image1);
+            session.persist(image2);
+            session.persist(video);
 
-                session.persist(carToMediaItem1);
-                session.persist(carToMediaItem2);
-                session.persist(carToMediaItem3);
-            });
+            session.persist(carToMediaItem1);
+            session.persist(carToMediaItem2);
+            session.persist(carToMediaItem3);
 
-            Car carWithMediaItems = openedSession.get(Car.class, car.getId());
+            session.flush();
+            session.evict(car);
+
+            Car carWithMediaItems = session.get(Car.class, car.getId());
             List<CarToMediaItem> carMediaItems = carWithMediaItems.getCarToMediaItems();
 
             Optional<CarToMediaItem> containImage1 = carMediaItems.stream()
@@ -166,29 +160,20 @@ class CarTest {
             var image1 = buildMediaItem(MediaItemType.CAR_IMAGE, user);
             var image2 = buildMediaItem(MediaItemType.CAR_IMAGE, user);
 
-            var carToMediaItem1 = CarToMediaItem.builder()
-                    .car(car)
-                    .mediaItem(image1)
-                    .position(1)
-                    .build();
-            var carToMediaItem2 = CarToMediaItem.builder()
-                    .car(car)
-                    .mediaItem(image2)
-                    .position(2)
-                    .build();
+            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
+            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
+            session.persist(user);
 
-                session.persist(image1);
-                session.persist(image2);
+            session.persist(image1);
+            session.persist(image2);
 
-                session.persist(carToMediaItem1);
-                session.persist(carToMediaItem2);
+            session.persist(carToMediaItem1);
+            session.persist(carToMediaItem2);
 
-                carToMediaItem1.setPosition(2);
-                carToMediaItem2.setPosition(1);
-            });
+            carToMediaItem1.setPosition(2);
+            carToMediaItem2.setPosition(1);
+            session.flush();
 
             assertThat(carToMediaItem1.getPosition()).isEqualTo(2);
             assertThat(carToMediaItem2.getPosition()).isEqualTo(1);
@@ -204,39 +189,28 @@ class CarTest {
             var image2 = buildMediaItem(MediaItemType.CAR_IMAGE, user);
             var video = buildMediaItem(MediaItemType.CAR_VIDEO, user);
 
-            var carToMediaItem1 = CarToMediaItem.builder()
-                    .car(car)
-                    .mediaItem(image1)
-                    .position(1)
-                    .build();
-            var carToMediaItem2 = CarToMediaItem.builder()
-                    .car(car)
-                    .mediaItem(image2)
-                    .position(2)
-                    .build();
-            var carToMediaItem3 = CarToMediaItem.builder()
-                    .car(car)
-                    .mediaItem(video)
-                    .position(1)
-                    .build();
+            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
+            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
+            var carToMediaItem3 = buildCarToMediaItem(car, video, 1);
 
-            sessionFactory.inTransaction(session -> {
-                session.persist(user);
+            session.persist(user);
 
-                session.persist(image1);
-                session.persist(image2);
-                session.persist(video);
+            session.persist(image1);
+            session.persist(image2);
+            session.persist(video);
 
-                session.persist(carToMediaItem1);
-                session.persist(carToMediaItem2);
-                session.persist(carToMediaItem3);
+            session.persist(carToMediaItem1);
+            session.persist(carToMediaItem2);
+            session.persist(carToMediaItem3);
 
-                session.remove(image1);
-                session.remove(image2);
-                session.remove(video);
-            });
+            session.remove(image1);
+            session.remove(image2);
+            session.remove(video);
 
-            Car carWithoutMediaItems = openedSession.get(Car.class, car.getId());
+            session.flush();
+            session.evict(car);
+
+            Car carWithoutMediaItems = session.get(Car.class, car.getId());
 
             assertThat(carWithoutMediaItems.getCarToMediaItems()).isEmpty();
         }
@@ -245,7 +219,12 @@ class CarTest {
 
     @AfterEach
     void closeConnection() {
-        openedSession.close();
+        session.getTransaction().rollback();
+    }
+
+    @AfterAll
+    static void closeSessionFactory() {
+        session.close();
         sessionFactory.close();
     }
 
@@ -280,6 +259,14 @@ class CarTest {
                 .link("link")
                 .previewLink("preview_link")
                 .uploader(uploader)
+                .build();
+    }
+
+    private CarToMediaItem buildCarToMediaItem(Car car, MediaItem video, int position) {
+        return CarToMediaItem.builder()
+                .car(car)
+                .mediaItem(video)
+                .position(position)
                 .build();
     }
 }

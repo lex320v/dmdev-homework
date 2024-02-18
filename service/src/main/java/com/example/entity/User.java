@@ -31,8 +31,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"avatarMediaItem", "cars", "mediaItems", "requests"}, callSuper = true)
-@EqualsAndHashCode(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems", "requests"}, callSuper = false)
+@ToString(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems", "requests"}, callSuper = true)
+@EqualsAndHashCode(of = "username", callSuper = false)
 @Entity(name = "users")
 public class User extends BaseEntitySoftDelete<Long> {
 
@@ -72,6 +72,9 @@ public class User extends BaseEntitySoftDelete<Long> {
     private MediaItem avatarMediaItem;
 
     public void setAvatar(MediaItem mediaItem) {
+        if (mediaItem != null) {
+            mediaItem.setUploader(this);
+        }
         this.avatarMediaItem = mediaItem;
     }
 

@@ -10,6 +10,8 @@ import com.example.util.HibernateTestUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,13 +19,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MediaItemTest {
 
-    SessionFactory sessionFactory;
-    Session openedSession;
+    static SessionFactory sessionFactory;
+    static Session session;
+
+    @BeforeAll
+    static void init() {
+        sessionFactory = HibernateTestUtil.buildSessionFactory();
+        session = sessionFactory.openSession();
+    }
 
     @BeforeEach
-    void prepare() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
-        openedSession = sessionFactory.openSession();
+    public void prepare() {
+        session.beginTransaction();
     }
 
     @Test
@@ -32,9 +39,7 @@ class MediaItemTest {
         var mediaItem = buildMediaItem();
         user.addMediaItem(mediaItem);
 
-        sessionFactory.inTransaction(session -> {
-            session.persist(user);
-        });
+        session.persist(user);
 
         assertThat(user.getId()).isNotNull();
     }
@@ -45,11 +50,9 @@ class MediaItemTest {
         var mediaItem = buildMediaItem();
         user.addMediaItem(mediaItem);
 
-        sessionFactory.inTransaction(session -> {
-            session.persist(user);
-        });
+        session.persist(user);
 
-        var mediaItemFromDb = openedSession.get(MediaItem.class, mediaItem.getId());
+        var mediaItemFromDb = session.get(MediaItem.class, mediaItem.getId());
 
         assertThat(mediaItemFromDb).isNotNull();
     }
@@ -60,20 +63,23 @@ class MediaItemTest {
         var mediaItem = buildMediaItem();
         user.addMediaItem(mediaItem);
 
-        sessionFactory.inTransaction(session -> {
-            session.persist(user);
-            user.getMediaItems().remove(mediaItem);
-            session.remove(mediaItem);
-        });
+        session.persist(user);
+        user.getMediaItems().remove(mediaItem);
+        session.remove(mediaItem);
 
-        var mediaItemFromDb = openedSession.get(MediaItem.class, mediaItem.getId());
+        var mediaItemFromDb = session.get(MediaItem.class, mediaItem.getId());
 
         assertThat(mediaItemFromDb).isNull();
     }
 
     @AfterEach
     void closeConnection() {
-        openedSession.close();
+        session.getTransaction().rollback();
+    }
+
+    @AfterAll
+    static void closeSessionFactory() {
+        session.close();
         sessionFactory.close();
     }
 

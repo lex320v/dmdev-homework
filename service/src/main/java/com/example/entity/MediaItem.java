@@ -25,8 +25,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"carToMediaItems"})
-@EqualsAndHashCode(exclude = {"carToMediaItems"}, callSuper = false)
+@ToString(exclude = {"carToMediaItems"}, callSuper = true)
+@EqualsAndHashCode(exclude = {"carToMediaItems"}, callSuper = true)
 @Entity
 public class MediaItem extends BaseEntity<Long>{
 
