@@ -23,7 +23,7 @@ import java.util.List;
 @Builder
 @ToString(exclude = "user")
 @Entity
-public class PersonalInfo implements BaseEntityId<Long> {
+public class PersonalInfo implements BaseEntityWithId<Long> {
 
     @Id
     @Column(name = "user_id")

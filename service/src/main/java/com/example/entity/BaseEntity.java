@@ -14,7 +14,7 @@ import java.time.Instant;
 @Setter
 @Getter
 @MappedSuperclass
-public abstract class BaseEntity<T extends Serializable> implements BaseEntityId<T> {
+public abstract class BaseEntity<T extends Serializable> implements BaseEntityWithId<T> {
 
     @CreationTimestamp
     private Instant createdAt;
