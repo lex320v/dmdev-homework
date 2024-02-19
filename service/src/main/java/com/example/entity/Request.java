@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@ToString(callSuper = true)
+@ToString(exclude = "feedbacks", callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
