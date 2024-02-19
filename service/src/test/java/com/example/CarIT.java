@@ -14,7 +14,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -24,11 +23,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CarIT {
 
-    static SessionFactory sessionFactory;
-    static Session session;
+    private static SessionFactory sessionFactory;
+    private static Session session;
 
     @BeforeAll
     static void init() {
@@ -37,8 +37,19 @@ class CarIT {
     }
 
     @BeforeEach
-    public void prepare() {
+    void prepare() {
         session.beginTransaction();
+    }
+
+    @AfterEach
+    void closeConnection() {
+        session.getTransaction().rollback();
+    }
+
+    @AfterAll
+    static void closeSessionFactory() {
+        session.close();
+        sessionFactory.close();
     }
 
     @Nested
@@ -147,9 +158,9 @@ class CarIT {
             Optional<CarToMediaItem> containVideo = carMediaItems.stream()
                     .filter(carToMediaItem -> carToMediaItem.getMediaItem().getId() == video.getId()).findFirst();
 
-            Assertions.assertTrue(containImage1.isPresent());
-            Assertions.assertTrue(containImage2.isPresent());
-            Assertions.assertTrue(containVideo.isPresent());
+            assertTrue(containImage1.isPresent());
+            assertTrue(containImage2.isPresent());
+            assertTrue(containVideo.isPresent());
         }
 
         @Test
@@ -215,18 +226,6 @@ class CarIT {
 
             assertThat(carWithoutMediaItems.getCarToMediaItems()).isEmpty();
         }
-    }
-
-
-    @AfterEach
-    void closeConnection() {
-        session.getTransaction().rollback();
-    }
-
-    @AfterAll
-    static void closeSessionFactory() {
-        session.close();
-        sessionFactory.close();
     }
 
     private User buildUser() {

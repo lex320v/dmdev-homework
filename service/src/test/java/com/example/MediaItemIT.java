@@ -9,8 +9,8 @@ import com.example.entity.enums.UserStatus;
 import com.example.util.HibernateTestUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MediaItemIT {
 
-    static SessionFactory sessionFactory;
-    static Session session;
+    private static SessionFactory sessionFactory;
+    private static Session session;
 
     @BeforeAll
     static void init() {
@@ -29,8 +29,19 @@ class MediaItemIT {
     }
 
     @BeforeEach
-    public void prepare() {
+    void prepare() {
         session.beginTransaction();
+    }
+
+    @AfterEach
+    void closeConnection() {
+        session.getTransaction().rollback();
+    }
+
+    @AfterAll
+    static void closeSessionFactory() {
+        session.close();
+        sessionFactory.close();
     }
 
     @Test
@@ -70,17 +81,6 @@ class MediaItemIT {
         var mediaItemFromDb = session.get(MediaItem.class, mediaItem.getId());
 
         assertThat(mediaItemFromDb).isNull();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        session.getTransaction().rollback();
-    }
-
-    @AfterAll
-    static void closeSessionFactory() {
-        session.close();
-        sessionFactory.close();
     }
 
     private MediaItem buildMediaItem() {

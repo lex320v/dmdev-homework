@@ -12,8 +12,8 @@ import com.example.entity.enums.UserStatus;
 import com.example.util.HibernateTestUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +23,8 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FeedbackIT {
-    static SessionFactory sessionFactory;
-    static Session session;
+    private static SessionFactory sessionFactory;
+    private static Session session;
 
     @BeforeAll
     static void init() {
@@ -33,8 +33,19 @@ class FeedbackIT {
     }
 
     @BeforeEach
-    public void prepare() {
+    void prepare() {
         session.beginTransaction();
+    }
+
+    @AfterEach
+    void closeConnection() {
+        session.getTransaction().rollback();
+    }
+
+    @AfterAll
+    static void closeSessionFactory() {
+        session.close();
+        sessionFactory.close();
     }
 
     @Test
@@ -104,17 +115,6 @@ class FeedbackIT {
         var feedbackFromDb = session.get(Feedback.class, feedback.getId());
 
         assertThat(feedbackFromDb).isNull();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        session.getTransaction().rollback();
-    }
-
-    @AfterAll
-    static void closeSessionFactory() {
-        session.close();
-        sessionFactory.close();
     }
 
     private User buildUser() {

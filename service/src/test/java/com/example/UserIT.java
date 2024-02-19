@@ -11,8 +11,8 @@ import com.example.entity.enums.UserStatus;
 import com.example.util.HibernateTestUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -26,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class UserIT {
 
-    static SessionFactory sessionFactory;
-    static Session session;
+    private static SessionFactory sessionFactory;
+    private static Session session;
 
     @BeforeAll
     static void init() {
@@ -38,6 +38,17 @@ class UserIT {
     @BeforeEach
     public void prepare() {
         session.beginTransaction();
+    }
+
+    @AfterEach
+    void closeConnection() {
+        session.getTransaction().rollback();
+    }
+
+    @AfterAll
+    static void closeSessionFactory() {
+        session.close();
+        sessionFactory.close();
     }
 
     @Nested
@@ -56,6 +67,7 @@ class UserIT {
             var user = buildUser();
 
             session.persist(user);
+            session.evict(user);
             session.evict(user);
 
             User userFromDb = session.get(User.class, user.getId());
@@ -240,18 +252,6 @@ class UserIT {
             assertThat(userWithAvatar.getAvatarMediaItem()).isNull();
         }
     }
-
-    @AfterEach
-    void closeConnection() {
-        session.getTransaction().rollback();
-    }
-
-    @AfterAll
-    static void closeSessionFactory() {
-        session.close();
-        sessionFactory.close();
-    }
-
 
     private User buildUser() {
         return User.builder()

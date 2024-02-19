@@ -4,8 +4,6 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -14,13 +12,7 @@ import java.time.Instant;
 @Setter
 @Getter
 @MappedSuperclass
-public abstract class BaseEntitySoftDelete<T extends Serializable> implements BaseEntityId<T>  {
-
-    @CreationTimestamp
-    private Instant createdAt;
-
-    @UpdateTimestamp
-    private Instant updatedAt;
+public abstract class BaseEntitySoftDelete<T extends Serializable> extends BaseEntity<T> implements BaseEntityId<T>  {
 
     private Instant deletedAt;
 }

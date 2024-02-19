@@ -21,12 +21,6 @@ public class HibernateTestUtil {
         configuration.setProperty("hibernate.connection.password", postgres.getPassword());
         configuration.configure();
 
-        System.out.println("===============");
-        System.out.println("DB_URL: " + configuration.getProperty("hibernate.connection.url"));
-        System.out.println("DB_USERNAME: " + configuration.getProperty("hibernate.connection.username"));
-        System.out.println("DB_PASSWORD: " + configuration.getProperty("hibernate.connection.password"));
-        System.out.println("===============");
-
         return configuration.buildSessionFactory();
     }
 }
