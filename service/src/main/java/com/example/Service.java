@@ -1,6 +1,6 @@
 package com.example;
 
-import com.example.entity.User;
+import com.example.dao.UserDao;
 import com.example.util.HibernateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -16,12 +16,9 @@ public class Service {
         try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
              Session session = sessionFactory.openSession()
         ) {
-            session.beginTransaction();
+            var t = UserDao.getInstance().findAll(session);
 
-            session.get(User.class, 1);
-
-            session.getTransaction().commit();
-
+            System.out.println(t);
         }
     }
 }
