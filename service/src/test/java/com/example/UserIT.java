@@ -32,11 +32,11 @@ class UserIT {
     @BeforeAll
     static void init() {
         sessionFactory = HibernateTestUtil.buildSessionFactory();
-        session = sessionFactory.openSession();
     }
 
     @BeforeEach
     public void prepare() {
+        session = sessionFactory.openSession();
         session.beginTransaction();
     }
 

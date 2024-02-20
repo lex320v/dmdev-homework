@@ -8,7 +8,7 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.time.Instant;
 
-@ToString
+@ToString(callSuper = true)
 @Setter
 @Getter
 @MappedSuperclass

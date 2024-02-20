@@ -33,11 +33,11 @@ class CarIT {
     @BeforeAll
     static void init() {
         sessionFactory = HibernateTestUtil.buildSessionFactory();
-        session = sessionFactory.openSession();
     }
 
     @BeforeEach
     void prepare() {
+        session = sessionFactory.openSession();
         session.beginTransaction();
     }
 
