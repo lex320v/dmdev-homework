@@ -71,6 +71,18 @@ public class User extends BaseEntitySoftDelete<Long> {
     @JoinColumn(name = "avatar_media_item_id")
     private MediaItem avatarMediaItem;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "uploader", cascade = CascadeType.ALL)
+    private List<MediaItem> mediaItems = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Car> cars = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    private List<Request> requests = new ArrayList<>();
+
     public void setAvatar(MediaItem mediaItem) {
         if (mediaItem != null) {
             mediaItem.setUploader(this);
@@ -78,27 +90,15 @@ public class User extends BaseEntitySoftDelete<Long> {
         this.avatarMediaItem = mediaItem;
     }
 
-    @Builder.Default
-    @OneToMany(mappedBy = "uploader", cascade = CascadeType.ALL)
-    private List<MediaItem> mediaItems = new ArrayList<>();
-
     public void addMediaItem(MediaItem mediaItem) {
         mediaItems.add(mediaItem);
         mediaItem.setUploader(this);
     }
 
-    @Builder.Default
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<Car> cars = new ArrayList<>();
-
     public void addCar(Car car) {
         cars.add(car);
         car.setOwner(this);
     }
-
-    @Builder.Default
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<Request> requests = new ArrayList<>();
 
     public void addRequest(Request request) {
         requests.add(request);

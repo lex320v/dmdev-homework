@@ -12,7 +12,7 @@ import java.time.Instant;
 @Setter
 @Getter
 @MappedSuperclass
-public abstract class BaseEntitySoftDelete<T extends Serializable> extends BaseEntity<T> implements BaseEntityWithId<T> {
+public abstract class BaseEntitySoftDelete<T extends Serializable> extends BaseEntity<T> implements IdentifiableEntity<T> {
 
     private Instant deletedAt;
 }

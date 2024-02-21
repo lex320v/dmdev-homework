@@ -22,7 +22,7 @@ CREATE TABLE users
     gender               VARCHAR(20) CHECK (gender IN ('MALE', 'FEMALE'))                        NOT NULL,
     role                 VARCHAR(20) CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'OWNER', 'CLIENT')) NOT NULL,
     avatar_media_item_id BIGINT UNIQUE REFERENCES media_item (id) ON DELETE SET NULL,
-    deleted_at           TIMESTAMP(6) DEFAULT NOW(),
+    deleted_at           TIMESTAMP(6),
     created_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL,
     updated_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL
 
@@ -89,7 +89,7 @@ CREATE TABLE feedback
     rating     INTEGER                        NOT NULL,
     text       VARCHAR(255),
     request_id BIGINT REFERENCES request (id) NOT NULL,
-    deleted_at TIMESTAMP(6) DEFAULT NOW(),
+    deleted_at TIMESTAMP(6),
     created_at TIMESTAMP(6) DEFAULT NOW()     NOT NULL,
     updated_at TIMESTAMP(6) DEFAULT NOW()     NOT NULL
 );

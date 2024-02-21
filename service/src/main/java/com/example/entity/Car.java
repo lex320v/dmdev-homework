@@ -19,10 +19,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,13 +66,13 @@ public class Car extends BaseEntity<Long> {
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
     private List<Request> requests = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    private List<CarToMediaItem> carToMediaItems = new ArrayList<>();
+
     public void addRequest(Request request, User creator) {
         request.setClient(creator);
         request.setCar(this);
         requests.add(request);
     }
-
-    @Builder.Default
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
-    private List<CarToMediaItem> carToMediaItems = new ArrayList<>();
 }
