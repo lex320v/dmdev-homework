@@ -1,34 +1,41 @@
 CREATE TABLE media_item
 (
     id           BIGSERIAL PRIMARY KEY,
-    created_at   TIMESTAMP(6) NOT NULL,
     type         VARCHAR(20) CHECK (type IN ('AVATAR', 'CAR_IMAGE', 'CAR_VIDEO')) NOT NULL,
-    uploader_id  BIGINT NOT NULL,
-    link         VARCHAR(255) NOT NULL,
-    mime_type    VARCHAR(255) NOT NULL,
-    preview_link VARCHAR(255)
+    mime_type    VARCHAR(255)                                                     NOT NULL,
+    uploader_id  BIGINT                                                           NOT NULL,
+    link         VARCHAR(255)                                                     NOT NULL,
+    preview_link VARCHAR(255),
+    created_at   TIMESTAMP(6) DEFAULT NOW()                                       NOT NULL,
+    updated_at   TIMESTAMP(6) DEFAULT NOW()                                       NOT NULL
+
 );
 
 CREATE TABLE users
 (
     id                   BIGSERIAL PRIMARY KEY,
-    birth_date           DATE,
-    gender               VARCHAR(20) CHECK (gender IN ('MALE', 'FEMALE')),
-    status               VARCHAR(20) CHECK (status IN ('ACTIVE', 'INACTIVE')),
-    avatar_media_item_id BIGINT,
-    created_at           TIMESTAMP(6),
+    status               VARCHAR(20) CHECK (status IN ('ACTIVE', 'INACTIVE'))                    NOT NULL,
+    username             VARCHAR(255) UNIQUE                                                     NOT NULL,
+    password             VARCHAR(255)                                                            NOT NULL,
+    firstname            VARCHAR(255)                                                            NOT NULL,
+    lastname             VARCHAR(255)                                                            NOT NULL,
+    gender               VARCHAR(20) CHECK (gender IN ('MALE', 'FEMALE'))                        NOT NULL,
+    role                 VARCHAR(20) CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'OWNER', 'CLIENT')) NOT NULL,
+    avatar_media_item_id BIGINT UNIQUE REFERENCES media_item (id) ON DELETE SET NULL,
     deleted_at           TIMESTAMP(6),
-    firstname            VARCHAR(255),
-    lastname             VARCHAR(255),
-    password             VARCHAR(255),
-    role                 VARCHAR(20) CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'OWNER', 'CLIENT')),
-    username             VARCHAR(255) UNIQUE
+    created_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL,
+    updated_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL
+
 );
+
+ALTER TABLE media_item
+    ADD CONSTRAINT media_item_uploader_id_fkey
+        FOREIGN KEY (uploader_id) REFERENCES users (id) ON DELETE CASCADE;
 
 CREATE TABLE personal_info
 (
-    user_id                       BIGINT PRIMARY KEY,
-    driver_license_date_of_birth  DATE,
+    user_id                       BIGINT PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE NOT NULL,
+    date_of_birth                 DATE,
     driver_license_date_of_expire DATE,
     driver_license_date_of_issue  DATE,
     driver_license_code           VARCHAR(255),
@@ -37,47 +44,54 @@ CREATE TABLE personal_info
     driver_license_place_of_birth VARCHAR(255),
     driver_license_residence      VARCHAR(255),
     driver_license_surname        VARCHAR(255),
-    driver_license_categories     SMALLINT ARRAY
+    driver_license_categories     VARCHAR(2) ARRAY
 );
 
 CREATE TABLE car
 (
     id           BIGSERIAL PRIMARY KEY,
-    horsepower   INTEGER   NOT NULL,
-    is_active    BOOLEAN   NOT NULL,
-    price        FLOAT(53) NOT NULL,
-    year         INTEGER   NOT NULL,
-    created_at   TIMESTAMP(6),
-    owner_id     BIGINT,
-    manufacturer VARCHAR(255),
-    model        VARCHAR(255),
-    type         VARCHAR(20) CHECK (type IN ('SEDAN', 'CROSSOVER', 'HATCHBACK', 'PICKUP', 'SPORT_CAR'))
+    manufacturer VARCHAR(255)                                                                           NOT NULL,
+    model        VARCHAR(255)                                                                           NOT NULL,
+    type         VARCHAR(20) CHECK (type IN ('SEDAN', 'CROSSOVER', 'HATCHBACK', 'PICKUP', 'SPORT_CAR')) NOT NULL,
+    year         INTEGER                                                                                NOT NULL,
+    horsepower   INTEGER                                                                                NOT NULL,
+    active       BOOLEAN                                                                                NOT NULL,
+    price        FLOAT(53)                                                                              NOT NULL,
+    owner_id     BIGINT REFERENCES users (id) ON DELETE CASCADE                                         NOT NULL,
+    created_at   TIMESTAMP(6) DEFAULT NOW()                                                             NOT NULL,
+    updated_at   TIMESTAMP(6) DEFAULT NOW()                                                             NOT NULL
 );
 
 CREATE TABLE car_to_media_item
 (
-    car_id        BIGINT NOT NULL,
-    media_item_id BIGINT NOT NULL,
+    car_id        BIGINT REFERENCES car (id) ON DELETE CASCADE        NOT NULL,
+    media_item_id BIGINT REFERENCES media_item (id) ON DELETE CASCADE NOT NULL,
+    position      INTEGER                                             NOT NULL,
     PRIMARY KEY (car_id, media_item_id)
+);
+
+CREATE TABLE request
+(
+    id             BIGSERIAL PRIMARY KEY,
+    status         VARCHAR(20) CHECK (status IN ('OPEN', 'PROCESSING', 'CLOSED', 'REJECTED')) NOT NULL,
+    comment        VARCHAR(255),
+    car_id         BIGINT REFERENCES car (id)                                                 NOT NULL,
+    client_id      BIGINT REFERENCES users (id)                                               NOT NULL,
+    date_time_from TIMESTAMP(6)                                                               NOT NULL,
+    date_time_to   TIMESTAMP(6)                                                               NOT NULL,
+    created_at     TIMESTAMP(6) DEFAULT NOW()                                                 NOT NULL,
+    updated_at     TIMESTAMP(6) DEFAULT NOW()                                                 NOT NULL
 );
 
 CREATE TABLE feedback
 (
     id         BIGSERIAL PRIMARY KEY,
-    rating     INTEGER NOT NULL,
-    created_at TIMESTAMP(6),
-    request_id BIGINT,
-    text       VARCHAR(255)
+    rating     INTEGER                        NOT NULL,
+    text       VARCHAR(255),
+    request_id BIGINT REFERENCES request (id) NOT NULL,
+    deleted_at TIMESTAMP(6),
+    created_at TIMESTAMP(6) DEFAULT NOW()     NOT NULL,
+    updated_at TIMESTAMP(6) DEFAULT NOW()     NOT NULL
 );
 
-CREATE TABLE request
-(
-    id         BIGSERIAL PRIMARY KEY,
-    car_id     INTEGER NOT NULL,
-    client_id  INTEGER NOT NULL,
-    created_at TIMESTAMP(6),
-    date_time_from  TIMESTAMP(6),
-    date_time_to    TIMESTAMP(6),
-    comment    VARCHAR(255),
-    status     VARCHAR(20) CHECK (status IN ('OPEN', 'PROCESSING', 'CLOSED', 'REJECTED'))
-);
+
