@@ -21,6 +21,10 @@ import java.util.List;
 public class UserDao {
     private static final UserDao INSTANCE = new UserDao();
 
+    public static UserDao getInstance() {
+        return INSTANCE;
+    }
+
     public List<User> findAll(Session session) {
         HibernateCriteriaBuilder cb = session.getCriteriaBuilder();
         JpaCriteriaQuery<User> criteria = cb.createQuery(User.class);
@@ -116,9 +120,5 @@ public class UserDao {
         System.out.println(result);
 
         return result;
-    }
-
-    public static UserDao getInstance() {
-        return INSTANCE;
     }
 }

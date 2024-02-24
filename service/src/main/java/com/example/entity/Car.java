@@ -27,8 +27,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"carToMediaItems", "requests"}, callSuper = true)
-@EqualsAndHashCode(exclude = {"carToMediaItems", "requests"}, callSuper = true)
+@ToString(exclude = {"owner", "carToMediaItems", "requests"}, callSuper = true)
+@EqualsAndHashCode(exclude = {"owner","carToMediaItems", "requests"}, callSuper = true)
 @Entity
 public class Car extends BaseEntity<Long> {
 
