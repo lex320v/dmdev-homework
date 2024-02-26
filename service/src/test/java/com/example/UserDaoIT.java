@@ -14,31 +14,28 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
-@TestInstance(PER_CLASS)
 public class UserDaoIT {
 
-    private final SessionFactory sessionFactory = HibernateTestUtil.buildSessionFactory();
+    private static final SessionFactory sessionFactory = HibernateTestUtil.buildSessionFactory();
     private final UserQueryDslDao userQueryDslDao = UserQueryDslDao.getInstance();
     private final UserCriteriaDao userCriteriaDao = UserCriteriaDao.getInstance();
     private Session session;
 
 
     @BeforeAll
-    void initDb() {
+    static void initDb() {
         TestDataImporter.importData(sessionFactory);
     }
 
     @AfterAll
-    void finish() {
+    static void finish() {
         sessionFactory.close();
     }
 
