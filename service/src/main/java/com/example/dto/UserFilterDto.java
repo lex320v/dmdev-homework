@@ -8,4 +8,6 @@ import lombok.Value;
 public class UserFilterDto {
     String firstname;
     String lastname;
+    String username;
+    Integer limit;
 }

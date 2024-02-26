@@ -26,6 +26,14 @@ public class QPredicate {
         return this;
     }
 
+    public QPredicate addLikeIgnoreCase(String search, Function<String, Predicate> function) {
+        if (search != null) {
+            predicates.add(function.apply("%" + search + "%"));
+        }
+
+        return this;
+    }
+
     public Predicate buildAnd() {
         return ExpressionUtils.allOf(predicates);
     }
