@@ -80,13 +80,8 @@ public class UserDaoIT {
 
             var result = userCriteriaDao.findUsers(session, userFilterDto);
 
-            Optional<User> user = result.stream().findFirst();
-
-            if (user.isPresent()) {
-                assertEquals(searchUsername, user.get().getUsername());
-            } else {
-                fail();
-            }
+            assertEquals(1, result.size());
+            assertEquals(searchUsername, result.get(0).getUsername());
         }
 
         @Test

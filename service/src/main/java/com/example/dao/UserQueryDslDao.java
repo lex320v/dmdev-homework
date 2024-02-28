@@ -13,6 +13,7 @@ import static com.example.entity.QUser.user;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserQueryDslDao {
+
     private static final UserQueryDslDao INSTANCE = new UserQueryDslDao();
 
     public static UserQueryDslDao getInstance() {

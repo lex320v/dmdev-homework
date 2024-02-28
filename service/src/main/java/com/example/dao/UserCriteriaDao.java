@@ -13,6 +13,7 @@ import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserCriteriaDao {
+
     private static final UserCriteriaDao INSTANCE = new UserCriteriaDao();
 
     public static UserCriteriaDao getInstance() {
