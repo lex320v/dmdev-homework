@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.dto.UserFilterDto;
 import com.example.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
