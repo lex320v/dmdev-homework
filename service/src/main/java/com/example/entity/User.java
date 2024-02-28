@@ -13,6 +13,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
@@ -27,6 +30,15 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.ArrayList;
 import java.util.List;
 
+@NamedEntityGraph(name = "withAvatarAndCar",
+        attributeNodes = {
+                @NamedAttributeNode("avatarMediaItem"),
+                @NamedAttributeNode(value = "cars", subgraph = "carRequests"),
+        },
+        subgraphs = {
+                @NamedSubgraph(name = "carRequests", attributeNodes = @NamedAttributeNode("requests"))
+        }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
