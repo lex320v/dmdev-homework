@@ -30,6 +30,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.ArrayList;
 import java.util.List;
 
+@NamedEntityGraph(name = "withPersonalInfo", attributeNodes = { @NamedAttributeNode("personalInfo") })
 @NamedEntityGraph(name = "withAvatarAndCar",
         attributeNodes = {
                 @NamedAttributeNode("avatarMediaItem"),
