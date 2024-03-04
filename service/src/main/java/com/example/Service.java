@@ -1,8 +1,12 @@
 package com.example;
 
+import com.example.dao.MediaItemRepository;
 import com.example.dao.UserRepository;
 import com.example.dto.UserCreateDto;
+import com.example.entity.MediaItem;
+import com.example.entity.User;
 import com.example.entity.enums.Gender;
+import com.example.entity.enums.MediaItemType;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
 import com.example.interceptor.TransactionInterceptor;
@@ -19,6 +23,7 @@ import org.hibernate.SessionFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.util.Optional;
 
 public class Service {
 
@@ -26,38 +31,8 @@ public class Service {
 
     public static void main(String[] args) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
-        try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory()) {
-            var session = (Session) Proxy.newProxyInstance(
-                    SessionFactory.class.getClassLoader(),
-                    new Class[]{Session.class},
-                    (proxy, method, args1) -> method.invoke(sessionFactory.getCurrentSession(), args1)
-            );
-            var userRepository = new UserRepository(session);
-            var userReadMapper = new UserReadMapper(new PersonalInfoReadMapper());
-            var userCreateMapper = new UserCreateMapper();
-
-            var transactionInterceptor = new TransactionInterceptor(sessionFactory);
-
-            UserService userService = new ByteBuddy()
-                    .subclass(UserService.class)
-                    .method(ElementMatchers.any())
-                    .intercept(MethodDelegation.to(transactionInterceptor))
-                    .make()
-                    .load(UserService.class.getClassLoader())
-                    .getLoaded()
-                    .getDeclaredConstructor(UserRepository.class, UserReadMapper.class, UserCreateMapper.class)
-                    .newInstance(userRepository, userReadMapper, userCreateMapper);
-
-            UserCreateDto userCreateDto = new UserCreateDto(
-                    "qqqq1",
-                    "qwerty",
-                    "www",
-                    "eee",
-                    Role.CLIENT,
-                    Gender.MALE,
-                    UserStatus.ACTIVE
-            );
-            System.out.println(userService.create(userCreateDto));
+        try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
+             Session session = sessionFactory.openSession()) {
         }
     }
 }
