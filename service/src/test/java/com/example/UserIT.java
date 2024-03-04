@@ -3,6 +3,7 @@ package com.example;
 import com.example.dao.MediaItemRepository;
 import com.example.dao.PersonalInfoRepository;
 import com.example.dao.UserRepository;
+import com.example.dto.UserFilterDto;
 import com.example.entity.MediaItem;
 import com.example.entity.PersonalInfo;
 import com.example.entity.User;
@@ -12,6 +13,7 @@ import com.example.entity.enums.MediaItemType;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
 import com.example.util.HibernateTestUtil;
+import com.example.util.TestDataImporter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterAll;
@@ -65,8 +67,7 @@ class UserIT {
     class UserCRUD {
         @Test
         void createAndReadUser() {
-            var user = buildUser();
-
+            var user = buildUser("lex1", "firstname_lex", "lastname_lex");
             var savedUser = userRepository.save(user);
             session.evict(user);
             var userFromDb = userRepository.findById(user.getId());
@@ -78,7 +79,7 @@ class UserIT {
 
         @Test
         void updateUser() {
-            var user = buildUser();
+            var user = buildUser("lex1", "firstname_lex", "lastname_lex");
 
             var updatedString = "updated_value";
             var updatedGender = Gender.FEMALE;
@@ -108,7 +109,7 @@ class UserIT {
 
         @Test
         void deleteUser() {
-            User user = buildUser();
+            User user = buildUser("lex1", "firstname_lex", "lastname_lex");
 
             userRepository.save(user);
             userRepository.delete(user);
@@ -117,6 +118,67 @@ class UserIT {
 
             assertTrue(userFromDb.isEmpty());
         }
+
+        @Test
+        void findAllByFirstnameAndLastname() {
+            var user1 = buildUser("aaa", "Александр", "Кузьмин");
+            var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
+            var user3 = buildUser("ссс", "Андрей", "Кузьмин");
+
+            userRepository.save(user1);
+            userRepository.save(user2);
+            userRepository.save(user3);
+
+            var searchFirstname = "алекс";
+            var searchLastname = "куз";
+            UserFilterDto userFilterDto = UserFilterDto.builder()
+                    .firstname(searchFirstname)
+                    .lastname(searchLastname)
+                    .build();
+
+            var result = userRepository.findAll(userFilterDto);
+
+            assertThat(result.size()).isEqualTo(2);
+
+            var result1 = result.get(0);
+            var result2 = result.get(1);
+
+            assertTrue(result1.getFirstname().toLowerCase().contains(searchFirstname));
+            assertTrue(result1.getLastname().toLowerCase().contains(searchLastname));
+
+            assertTrue(result2.getFirstname().toLowerCase().contains(searchFirstname));
+            assertTrue(result2.getLastname().toLowerCase().contains(searchLastname));
+        }
+
+        @Test
+        void findAllByUsername() {
+            var user1 = buildUser("aaa", "Александр", "Кузьмин");
+            var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
+
+            userRepository.save(user1);
+            userRepository.save(user2);
+
+            var searchUsername = "aaa";
+            UserFilterDto userFilterDto = UserFilterDto.builder()
+                    .username(searchUsername)
+                    .build();
+
+            var result = userRepository.findAll(userFilterDto);
+
+            assertThat(result.size()).isEqualTo(1);
+            assertThat(result.get(0).getUsername()).isEqualTo(searchUsername);
+        }
+
+        @Test
+        void findAllWithLimit() {
+            TestDataImporter.importData(session);
+
+            UserFilterDto userFilterDto = UserFilterDto.builder().limit(5).build();
+
+            var result = userRepository.findAll(userFilterDto);
+
+            assertThat(result.size()).isEqualTo(5);
+        }
     }
 
     @Nested
@@ -124,7 +186,7 @@ class UserIT {
         @Test
         void createAndReadPersonalInfo() {
             PersonalInfo personalInfo = buildPersonalInfo();
-            User user = buildUser();
+            User user = buildUser("lex1", "firstname_lex", "lastname_lex");
 
             userRepository.save(user);
             personalInfo.setUser(user);
@@ -141,7 +203,7 @@ class UserIT {
         @Test
         void updatePersonalInfo() {
             PersonalInfo personalInfo = buildPersonalInfo();
-            User user = buildUser();
+            User user = buildUser("lex1", "firstname_lex", "lastname_lex");
 
             var updatedString = "updated_value";
             var updatedDate = LocalDate.of(2012, 12, 12);
@@ -182,7 +244,7 @@ class UserIT {
 
         @Test
         void deletePersonalInfo() {
-            User user = buildUser();
+            User user = buildUser("lex1", "firstname_lex", "lastname_lex");
             PersonalInfo personalInfo = buildPersonalInfo();
 
             userRepository.save(user);
@@ -202,7 +264,7 @@ class UserIT {
 
         @Test
         void createAndReadAvatar() {
-            var user = buildUser();
+            var user = buildUser("lex1", "firstname_lex", "lastname_lex");
             var avatar = buildMediaItem();
 
             userRepository.save(user);
@@ -220,7 +282,7 @@ class UserIT {
 
         @Test
         void updateAvatar() {
-            var user = buildUser();
+            var user = buildUser("lex1", "firstname_lex", "lastname_lex");
             var avatar = buildMediaItem();
             var updated_avatar = buildMediaItem();
 
@@ -246,7 +308,7 @@ class UserIT {
 
         @Test
         void deleteAvatar() {
-            var user = buildUser();
+            var user = buildUser("lex1", "firstname_lex", "lastname_lex");
             var avatar = buildMediaItem();
 
             userRepository.save(user);
@@ -264,11 +326,11 @@ class UserIT {
         }
     }
 
-    private User buildUser() {
+    private User buildUser(String username, String firstname, String lastname) {
         return User.builder()
-                .username("lex1")
-                .firstname("firstname_lex")
-                .lastname("lastname_lex")
+                .username(username)
+                .firstname(firstname)
+                .lastname(lastname)
                 .password("qwerty")
                 .status(UserStatus.ACTIVE)
                 .gender(Gender.MALE)

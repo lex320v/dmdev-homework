@@ -12,7 +12,6 @@ import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
 import lombok.experimental.UtilityClass;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,9 +19,8 @@ import java.time.LocalDateTime;
 @UtilityClass
 public class TestDataImporter {
 
-    public void importData(SessionFactory sessionFactory) {
-
-        sessionFactory.inTransaction(session -> {
+    public void importData(Session session) {
+        try {
             saveUser(session, "miness", "Александр", "Кузнецов", Gender.MALE, Role.SUPER_ADMIN);
             saveUser(session, "victorin", "Артём", "Михайлов", Gender.MALE, Role.ADMIN);
             saveUser(session, "xuan", "Михаил", "Черкасов", Gender.MALE, Role.ADMIN);
@@ -72,7 +70,11 @@ public class TestDataImporter {
             saveFeedback(session, request4, 2);
             saveFeedback(session, request5, 2);
             saveFeedback(session, request6, 3);
-        });
+        } catch (RuntimeException exception) {
+            session.getTransaction().rollback();
+            throw exception;
+        }
+
     }
 
     private User saveUser(Session session, String username, String firstname, String lastname,
@@ -117,7 +119,7 @@ public class TestDataImporter {
     }
 
     private Request saveRequest(Session session, User client, Car car, RequestStatus status) {
-        var request =  Request.builder()
+        var request = Request.builder()
                 .dateTimeFrom(LocalDateTime.now())
                 .dateTimeTo(LocalDateTime.now().plusHours(8))
                 .client(client)
