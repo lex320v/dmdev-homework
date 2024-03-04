@@ -93,13 +93,16 @@ class RequestIT {
         request.setDateTimeTo(updatedDateTime);
         request.setStatus(updatedStatus);
         request.setComment(updatedString);
-
         requestRepository.update(request);
 
-        assertThat(request.getDateTimeFrom()).isEqualTo(updatedDateTime);
-        assertThat(request.getDateTimeTo()).isEqualTo(updatedDateTime);
-        assertThat(request.getStatus()).isEqualTo(updatedStatus);
-        assertThat(request.getComment()).isEqualTo(updatedString);
+        session.evict(request);
+        var requestFromDb = requestRepository.findById(request.getId());
+
+        assertTrue(requestFromDb.isPresent());
+        assertThat(requestFromDb.get().getDateTimeFrom()).isEqualTo(updatedDateTime);
+        assertThat(requestFromDb.get().getDateTimeTo()).isEqualTo(updatedDateTime);
+        assertThat(requestFromDb.get().getStatus()).isEqualTo(updatedStatus);
+        assertThat(requestFromDb.get().getComment()).isEqualTo(updatedString);
     }
 
     @Test

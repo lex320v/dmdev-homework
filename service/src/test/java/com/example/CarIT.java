@@ -108,8 +108,8 @@ class CarIT {
             car.setType(updatedType);
 
             carRepository.update(car);
-            session.evict(car);
 
+            session.evict(car);
             var carFromDb = carRepository.findById(car.getId());
 
             assertTrue(carFromDb.isPresent());
@@ -206,8 +206,15 @@ class CarIT {
             carToMediaItemRepository.update(carToMediaItem1);
             carToMediaItemRepository.update(carToMediaItem2);
 
-            assertThat(carToMediaItem1.getPosition()).isEqualTo(2);
-            assertThat(carToMediaItem2.getPosition()).isEqualTo(1);
+            session.evict(carToMediaItem1);
+            session.evict(carToMediaItem2);
+            var ctmiFromDb1 = carToMediaItemRepository.findByCompositeId(car.getId(), image1.getId());
+            var ctmiFromDb2 = carToMediaItemRepository.findByCompositeId(car.getId(), image2.getId());
+
+            assertTrue(ctmiFromDb1.isPresent());
+            assertTrue(ctmiFromDb2.isPresent());
+            assertThat(ctmiFromDb1.get().getPosition()).isEqualTo(2);
+            assertThat(ctmiFromDb2.get().getPosition()).isEqualTo(1);
         }
 
         @Test

@@ -92,15 +92,18 @@ class UserIT {
             user.setGender(updatedGender);
             user.setRole(updatedRole);
             user.setPassword(updatedString);
-
             userRepository.update(user);
 
-            assertThat(user.getUsername()).isEqualTo(updatedString);
-            assertThat(user.getFirstname()).isEqualTo(updatedString);
-            assertThat(user.getLastname()).isEqualTo(updatedString);
-            assertThat(user.getGender()).isEqualTo(updatedGender);
-            assertThat(user.getRole()).isEqualTo(updatedRole);
-            assertThat(user.getPassword()).isEqualTo(updatedString);
+            session.evict(user);
+            var userFromDb = userRepository.findById(user.getId());
+
+            assertTrue(userFromDb.isPresent());
+            assertThat(userFromDb.get().getUsername()).isEqualTo(updatedString);
+            assertThat(userFromDb.get().getFirstname()).isEqualTo(updatedString);
+            assertThat(userFromDb.get().getLastname()).isEqualTo(updatedString);
+            assertThat(userFromDb.get().getGender()).isEqualTo(updatedGender);
+            assertThat(userFromDb.get().getRole()).isEqualTo(updatedRole);
+            assertThat(userFromDb.get().getPassword()).isEqualTo(updatedString);
         }
 
         @Test
@@ -161,16 +164,20 @@ class UserIT {
             personalInfo.setDriverLicenseCategories(updatedCategories);
             personalInfoRepository.update(personalInfo);
 
-            assertThat(personalInfo.getDriverLicenseName()).isEqualTo(updatedString);
-            assertThat(personalInfo.getDriverLicenseSurname()).isEqualTo(updatedString);
-            assertThat(personalInfo.getDriverLicensePlaceOfBirth()).isEqualTo(updatedString);
-            assertThat(personalInfo.getDriverLicenseIssuedBy()).isEqualTo(updatedString);
-            assertThat(personalInfo.getDriverLicenseCode()).isEqualTo(updatedString);
-            assertThat(personalInfo.getDriverLicenseResidence()).isEqualTo(updatedString);
-            assertThat(personalInfo.getDateOfBirth()).isEqualTo(updatedDate);
-            assertThat(personalInfo.getDriverLicenseDateOfIssue()).isEqualTo(updatedDate);
-            assertThat(personalInfo.getDriverLicenseDateOfExpire()).isEqualTo(updatedDate);
-            assertThat(personalInfo.getDriverLicenseCategories()).isEqualTo(updatedCategories);
+            session.evict(personalInfo);
+            var personalInfoFromDb = personalInfoRepository.findById(personalInfo.getId());
+
+            assertTrue(personalInfoFromDb.isPresent());
+            assertThat(personalInfoFromDb.get().getDriverLicenseName()).isEqualTo(updatedString);
+            assertThat(personalInfoFromDb.get().getDriverLicenseSurname()).isEqualTo(updatedString);
+            assertThat(personalInfoFromDb.get().getDriverLicensePlaceOfBirth()).isEqualTo(updatedString);
+            assertThat(personalInfoFromDb.get().getDriverLicenseIssuedBy()).isEqualTo(updatedString);
+            assertThat(personalInfoFromDb.get().getDriverLicenseCode()).isEqualTo(updatedString);
+            assertThat(personalInfoFromDb.get().getDriverLicenseResidence()).isEqualTo(updatedString);
+            assertThat(personalInfoFromDb.get().getDateOfBirth()).isEqualTo(updatedDate);
+            assertThat(personalInfoFromDb.get().getDriverLicenseDateOfIssue()).isEqualTo(updatedDate);
+            assertThat(personalInfoFromDb.get().getDriverLicenseDateOfExpire()).isEqualTo(updatedDate);
+            assertThat(personalInfoFromDb.get().getDriverLicenseCategories()).isEqualTo(updatedCategories);
         }
 
         @Test

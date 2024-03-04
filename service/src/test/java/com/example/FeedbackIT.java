@@ -1,5 +1,9 @@
 package com.example;
 
+import com.example.dao.CarRepository;
+import com.example.dao.FeedbackRepository;
+import com.example.dao.RequestRepository;
+import com.example.dao.UserRepository;
 import com.example.entity.Car;
 import com.example.entity.Feedback;
 import com.example.entity.Request;
@@ -21,10 +25,15 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FeedbackIT {
     private static SessionFactory sessionFactory;
     private static Session session;
+    private UserRepository userRepository;
+    private CarRepository carRepository;
+    private RequestRepository requestRepository;
+    private FeedbackRepository feedbackRepository;
 
     @BeforeAll
     static void init() {
@@ -33,7 +42,11 @@ class FeedbackIT {
 
     @BeforeEach
     void prepare() {
-        session = sessionFactory.openSession();
+        session = sessionFactory.getCurrentSession();
+        userRepository = new UserRepository(session);
+        carRepository = new CarRepository(session);
+        requestRepository = new RequestRepository(session);
+        feedbackRepository = new FeedbackRepository(session);
         session.beginTransaction();
     }
 
@@ -44,12 +57,11 @@ class FeedbackIT {
 
     @AfterAll
     static void closeSessionFactory() {
-        session.close();
         sessionFactory.close();
     }
 
     @Test
-    void createAndGetFeedback() {
+    void createAndReadFeedback() {
         var user = buildUser();
         var car = buildCar();
         user.addCar(car);
@@ -60,11 +72,16 @@ class FeedbackIT {
         var feedback = buildFeedback();
         request.addFeedback(feedback);
 
-        session.persist(user);
+        userRepository.save(user);
+        carRepository.save(car);
+        requestRepository.save(request);
+        feedbackRepository.save(feedback);
+        session.evict(feedback);
 
-        var feedbackFromDb = session.get(Feedback.class, feedback.getId());
+        var feedbackFromDb = feedbackRepository.findById(feedback.getId());
 
-        assertThat(feedbackFromDb).isNotNull();
+        assertTrue(feedbackFromDb.isPresent());
+        assertThat(feedbackFromDb.get()).isEqualTo(feedback);
     }
 
     @Test
@@ -82,16 +99,21 @@ class FeedbackIT {
         var updatedString = "updated string";
         var updatedInteger = 10;
 
-        session.persist(user);
+        userRepository.save(user);
+        carRepository.save(car);
+        requestRepository.save(request);
+        feedbackRepository.save(feedback);
 
         feedback.setText(updatedString);
         feedback.setRating(updatedInteger);
-        session.flush();
+        feedbackRepository.update(feedback);
 
-        var feedbackFromDb = session.get(Feedback.class, feedback.getId());
+        session.evict(feedback);
+        var feedbackFromDb = feedbackRepository.findById(feedback.getId());
 
-        assertThat(feedbackFromDb.getText()).isEqualTo(updatedString);
-        assertThat(feedbackFromDb.getRating()).isEqualTo(updatedInteger);
+        assertTrue(feedbackFromDb.isPresent());
+        assertThat(feedbackFromDb.get().getText()).isEqualTo(updatedString);
+        assertThat(feedbackFromDb.get().getRating()).isEqualTo(updatedInteger);
     }
 
     @Test
@@ -106,15 +128,16 @@ class FeedbackIT {
         var feedback = buildFeedback();
         request.addFeedback(feedback);
 
-        session.persist(user);
-        request.getFeedbacks().remove(feedback);
+        userRepository.save(user);
+        carRepository.save(car);
+        requestRepository.save(request);
+        feedbackRepository.save(feedback);
 
-        session.remove(feedback);
-        session.flush();
+        feedbackRepository.delete(feedback);
 
-        var feedbackFromDb = session.get(Feedback.class, feedback.getId());
+        var feedbackFromDb = feedbackRepository.findById(feedback.getId());
 
-        assertThat(feedbackFromDb).isNull();
+        assertTrue(feedbackFromDb.isEmpty());
     }
 
     private User buildUser() {
