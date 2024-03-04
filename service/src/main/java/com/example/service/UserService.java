@@ -44,7 +44,7 @@ public class UserService {
     @Transactional
     public boolean delete(Long id) {
         var optionalUser = userRepository.findById(id);
-        optionalUser.ifPresent(user -> userRepository.delete(user.getId()));
+        optionalUser.ifPresent(user -> userRepository.delete(user));
         return optionalUser.isPresent();
     }
 }

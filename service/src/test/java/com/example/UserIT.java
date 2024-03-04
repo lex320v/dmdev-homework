@@ -1,5 +1,8 @@
 package com.example;
 
+import com.example.dao.MediaItemRepository;
+import com.example.dao.PersonalInfoRepository;
+import com.example.dao.UserRepository;
 import com.example.entity.MediaItem;
 import com.example.entity.PersonalInfo;
 import com.example.entity.User;
@@ -20,14 +23,19 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UserIT {
 
     private static SessionFactory sessionFactory;
     private static Session session;
+
+    private UserRepository userRepository;
+    private PersonalInfoRepository personalInfoRepository;
+    private MediaItemRepository mediaItemRepository;
 
     @BeforeAll
     static void init() {
@@ -36,7 +44,10 @@ class UserIT {
 
     @BeforeEach
     public void prepare() {
-        session = sessionFactory.openSession();
+        session = sessionFactory.getCurrentSession();
+        userRepository = new UserRepository(session);
+        personalInfoRepository = new PersonalInfoRepository(session);
+        mediaItemRepository = new MediaItemRepository(session);
         session.beginTransaction();
     }
 
@@ -47,32 +58,22 @@ class UserIT {
 
     @AfterAll
     static void closeSessionFactory() {
-        session.close();
         sessionFactory.close();
     }
 
     @Nested
     class UserCRUD {
         @Test
-        void createUser() {
+        void createAndReadUser() {
             var user = buildUser();
 
-            session.persist(user);
-
-            assertNotNull(user.getId());
-        }
-
-        @Test
-        void readUser() {
-            var user = buildUser();
-
-            session.persist(user);
+            var savedUser = userRepository.save(user);
             session.evict(user);
-            session.evict(user);
+            var userFromDb = userRepository.findById(user.getId());
 
-            User userFromDb = session.get(User.class, user.getId());
-
-            assertThat(userFromDb).isEqualTo(user);
+            assertNotNull(savedUser.getId());
+            assertTrue(userFromDb.isPresent());
+            assertThat(userFromDb.get()).isEqualTo(user);
         }
 
         @Test
@@ -83,7 +84,7 @@ class UserIT {
             var updatedGender = Gender.FEMALE;
             var updatedRole = Role.CLIENT;
 
-            session.persist(user);
+            userRepository.save(user);
 
             user.setUsername(updatedString);
             user.setFirstname(updatedString);
@@ -91,7 +92,8 @@ class UserIT {
             user.setGender(updatedGender);
             user.setRole(updatedRole);
             user.setPassword(updatedString);
-            session.flush();
+
+            userRepository.update(user);
 
             assertThat(user.getUsername()).isEqualTo(updatedString);
             assertThat(user.getFirstname()).isEqualTo(updatedString);
@@ -105,42 +107,32 @@ class UserIT {
         void deleteUser() {
             User user = buildUser();
 
-            session.persist(user);
-            session.remove(user);
+            userRepository.save(user);
+            userRepository.delete(user);
 
-            User userFromDb = session.get(User.class, user.getId());
+            Optional<User> userFromDb = userRepository.findById(user.getId());
 
-            assertThat(userFromDb).isNull();
+            assertTrue(userFromDb.isEmpty());
         }
     }
 
     @Nested
     class PersonalInfoCRUD {
         @Test
-        void createPersonalInfo() {
+        void createAndReadPersonalInfo() {
             PersonalInfo personalInfo = buildPersonalInfo();
             User user = buildUser();
 
-            session.persist(user);
+            userRepository.save(user);
             personalInfo.setUser(user);
-            session.flush();
-
-            assertThat(personalInfo.getId()).isNotNull();
-        }
-
-        @Test
-        void readPersonalInfo() {
-            PersonalInfo personalInfo = buildPersonalInfo();
-            User user = buildUser();
-
-            session.persist(user);
-            personalInfo.setUser(user);
+            personalInfoRepository.save(personalInfo);
             session.flush();
             session.evict(personalInfo);
 
-            session.get(PersonalInfo.class, personalInfo.getId());
+            Optional<PersonalInfo> personalInfoFromDb = personalInfoRepository.findById(personalInfo.getId());
 
-            assertThat(personalInfo).isNotNull();
+            assertTrue(personalInfoFromDb.isPresent());
+            assertThat(personalInfoFromDb.get()).isEqualTo(personalInfo);
         }
 
         @Test
@@ -152,8 +144,10 @@ class UserIT {
             var updatedDate = LocalDate.of(2012, 12, 12);
             var updatedCategories = List.of(DriverLicenseCategories.M, DriverLicenseCategories.B);
 
-            session.persist(user);
+            userRepository.save(user);
             personalInfo.setUser(user);
+            personalInfoRepository.save(personalInfo);
+            session.flush();
 
             personalInfo.setDriverLicenseName(updatedString);
             personalInfo.setDriverLicenseSurname(updatedString);
@@ -165,8 +159,7 @@ class UserIT {
             personalInfo.setDriverLicenseDateOfIssue(updatedDate);
             personalInfo.setDriverLicenseDateOfExpire(updatedDate);
             personalInfo.setDriverLicenseCategories(updatedCategories);
-            session.flush();
-
+            personalInfoRepository.update(personalInfo);
 
             assertThat(personalInfo.getDriverLicenseName()).isEqualTo(updatedString);
             assertThat(personalInfo.getDriverLicenseSurname()).isEqualTo(updatedString);
@@ -185,15 +178,15 @@ class UserIT {
             User user = buildUser();
             PersonalInfo personalInfo = buildPersonalInfo();
 
-            session.persist(user);
+            userRepository.save(user);
             personalInfo.setUser(user);
-            session.flush();
+            personalInfoRepository.save(personalInfo);
             user.setPersonalInfo(null);
-            session.remove(personalInfo);
+            personalInfoRepository.delete(personalInfo);
 
-            PersonalInfo personalInfoFromDb = session.get(PersonalInfo.class, personalInfo.getId());
+            Optional<PersonalInfo> personalInfoFromDb = personalInfoRepository.findById(personalInfo.getId());
 
-            assertThat(personalInfoFromDb).isNull();
+            assertTrue(personalInfoFromDb.isEmpty());
         }
     }
 
@@ -201,18 +194,21 @@ class UserIT {
     class AvatarCRUD {
 
         @Test
-        void createAndGetAvatar() {
+        void createAndReadAvatar() {
             var user = buildUser();
             var avatar = buildMediaItem();
 
-            session.persist(user);
+            userRepository.save(user);
+            avatar.setUploader(user);
+            mediaItemRepository.save(avatar);
             user.setAvatar(avatar);
-            session.flush();
+            userRepository.update(user);
             session.evict(user);
 
-            var userWithAvatar = session.get(User.class, user.getId());
+            var userWithAvatar = userRepository.findById(user.getId());
 
-            assertThat(userWithAvatar.getAvatarMediaItem()).isNotNull();
+            assertTrue(userWithAvatar.isPresent());
+            assertThat(userWithAvatar.get().getAvatarMediaItem()).isNotNull();
         }
 
         @Test
@@ -221,18 +217,24 @@ class UserIT {
             var avatar = buildMediaItem();
             var updated_avatar = buildMediaItem();
 
-            session.persist(user);
-
+            userRepository.save(user);
+            avatar.setUploader(user);
+            mediaItemRepository.save(avatar);
             user.setAvatar(avatar);
-            session.flush();
+            userRepository.update(user);
+
+            updated_avatar.setUploader(user);
+            mediaItemRepository.save(updated_avatar);
             user.setAvatar(updated_avatar);
-            session.flush();
+            userRepository.update(user);
+            session.evict(user);
 
-            session.remove(avatar);
+            mediaItemRepository.delete(avatar);
 
-            var userWithAvatar = session.get(User.class, user.getId());
+            var userWithAvatar = userRepository.findById(user.getId());
 
-            assertThat(userWithAvatar.getAvatarMediaItem().getId()).isNotEqualTo(avatar.getId());
+            assertTrue(userWithAvatar.isPresent());
+            assertThat(userWithAvatar.get().getAvatarMediaItem().getId()).isNotEqualTo(avatar.getId());
         }
 
         @Test
@@ -240,16 +242,18 @@ class UserIT {
             var user = buildUser();
             var avatar = buildMediaItem();
 
-            session.persist(user);
+            userRepository.save(user);
+            avatar.setUploader(user);
+            mediaItemRepository.save(avatar);
             user.setAvatar(avatar);
-            session.flush();
+            userRepository.update(user);
 
             user.setAvatar(null);
-            session.remove(avatar);
+            mediaItemRepository.delete(avatar);
 
-            var userWithAvatar = session.get(User.class, user.getId());
+            var deletedAvatar = mediaItemRepository.findById(avatar.getId());
 
-            assertThat(userWithAvatar.getAvatarMediaItem()).isNull();
+            assertTrue(deletedAvatar.isEmpty());
         }
     }
 

@@ -24,14 +24,15 @@ public abstract class BaseRepository<K extends Serializable, E extends Identifia
     }
 
     @Override
-    public void delete(K id) {
-        entityManager.remove(id);
+    public void delete(E entity) {
+        entityManager.remove(entity);
         entityManager.flush();
     }
 
     @Override
     public void update(E entity) {
         entityManager.merge(entity);
+        entityManager.flush();
     }
 
     @Override
