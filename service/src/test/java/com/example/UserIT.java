@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserIT {
 
@@ -68,11 +68,11 @@ class UserIT {
         @Test
         void createAndReadUser() {
             var user = buildUser("lex1", "firstname_lex", "lastname_lex");
-            var savedUser = userRepository.save(user);
+            userRepository.save(user);
+
             session.evict(user);
             var userFromDb = userRepository.findById(user.getId());
 
-            assertNotNull(savedUser.getId());
             assertTrue(userFromDb.isPresent());
             assertThat(userFromDb.get()).isEqualTo(user);
         }
