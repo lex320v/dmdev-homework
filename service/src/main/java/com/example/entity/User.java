@@ -76,10 +76,10 @@ public class User extends BaseEntitySoftDelete<Long> {
     @Column(nullable = false)
     private UserStatus status;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, optional = false)
     private PersonalInfo personalInfo;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "avatar_media_item_id")
     private MediaItem avatarMediaItem;
@@ -89,7 +89,7 @@ public class User extends BaseEntitySoftDelete<Long> {
     private List<MediaItem> mediaItems = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner")
     private List<Car> cars = new ArrayList<>();
 
     @Builder.Default

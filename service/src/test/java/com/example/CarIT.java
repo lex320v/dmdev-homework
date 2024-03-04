@@ -1,5 +1,9 @@
 package com.example;
 
+import com.example.dao.CarRepository;
+import com.example.dao.CarToMediaItemRepository;
+import com.example.dao.MediaItemRepository;
+import com.example.dao.UserRepository;
 import com.example.entity.Car;
 import com.example.entity.CarToMediaItem;
 import com.example.entity.MediaItem;
@@ -29,6 +33,11 @@ class CarIT {
 
     private static SessionFactory sessionFactory;
     private static Session session;
+    private UserRepository userRepository;
+    private CarRepository carRepository;
+    private MediaItemRepository mediaItemRepository;
+    private CarToMediaItemRepository carToMediaItemRepository;
+
 
     @BeforeAll
     static void init() {
@@ -37,7 +46,12 @@ class CarIT {
 
     @BeforeEach
     void prepare() {
-        session = sessionFactory.openSession();
+        session = sessionFactory.getCurrentSession();
+        userRepository = new UserRepository(session);
+        carRepository = new CarRepository(session);
+        mediaItemRepository = new MediaItemRepository(session);
+        carToMediaItemRepository =new CarToMediaItemRepository(session);
+        new MediaItemRepository(session);
         session.beginTransaction();
     }
 
@@ -48,7 +62,6 @@ class CarIT {
 
     @AfterAll
     static void closeSessionFactory() {
-        session.close();
         sessionFactory.close();
     }
 
@@ -56,16 +69,19 @@ class CarIT {
     class CarCRUD {
 
         @Test
-        void createAndGetCar() {
+        void createAndReadCar() {
             var user = buildUser();
             var car = buildCar();
             user.addCar(car);
 
-            session.persist(user);
+            userRepository.save(user);
+            carRepository.save(car);
+            session.evict(car);
 
-            var carFromDb = session.get(Car.class, car.getId());
+            var carFromDb = carRepository.findById(car.getId());
 
-            assertThat(carFromDb).isNotNull();
+            assertTrue(carFromDb.isPresent());
+            assertThat(carFromDb.get()).isEqualTo(car);
         }
 
         @Test
@@ -80,7 +96,9 @@ class CarIT {
             var updatedBoolean = false;
             var updatedType = CarType.CROSSOVER;
 
-            session.persist(user);
+            userRepository.save(user);
+            carRepository.save(car);
+
             car.setManufacturer(updatedString);
             car.setModel(updatedString);
             car.setYear(updatedInteger);
@@ -89,18 +107,19 @@ class CarIT {
             car.setActive(updatedBoolean);
             car.setType(updatedType);
 
-            session.flush();
+            carRepository.update(car);
             session.evict(car);
 
-            var carFromDb = session.get(Car.class, car.getId());
+            var carFromDb = carRepository.findById(car.getId());
 
-            assertThat(carFromDb.getManufacturer()).isEqualTo(updatedString);
-            assertThat(carFromDb.getModel()).isEqualTo(updatedString);
-            assertThat(carFromDb.getYear()).isEqualTo(updatedInteger);
-            assertThat(carFromDb.getHorsepower()).isEqualTo(updatedInteger);
-            assertThat(carFromDb.getPrice()).isEqualTo(updatedDouble);
-            assertThat(carFromDb.getActive()).isEqualTo(updatedBoolean);
-            assertThat(carFromDb.getType()).isEqualTo(updatedType);
+            assertTrue(carFromDb.isPresent());
+            assertThat(carFromDb.get().getManufacturer()).isEqualTo(updatedString);
+            assertThat(carFromDb.get().getModel()).isEqualTo(updatedString);
+            assertThat(carFromDb.get().getYear()).isEqualTo(updatedInteger);
+            assertThat(carFromDb.get().getHorsepower()).isEqualTo(updatedInteger);
+            assertThat(carFromDb.get().getPrice()).isEqualTo(updatedDouble);
+            assertThat(carFromDb.get().getActive()).isEqualTo(updatedBoolean);
+            assertThat(carFromDb.get().getType()).isEqualTo(updatedType);
         }
 
         @Test
@@ -109,20 +128,22 @@ class CarIT {
             var car = buildCar();
             user.addCar(car);
 
-            session.persist(user);
+            userRepository.save(user);
+            carRepository.save(car);
+
             user.getCars().remove(car);
-            session.remove(car);
+            carRepository.delete(car);
 
-            var carFromDb = session.get(Car.class, car.getId());
+            var carFromDb = carRepository.findById(car.getId());
 
-            assertThat(carFromDb).isNull();
+            assertTrue(carFromDb.isEmpty());
         }
     }
 
     @Nested
     class CarMediaItemsCRUD {
         @Test
-        void createAndGetMediaItems() {
+        void createAndReadMediaItems() {
             var user = buildUser();
             var car = buildCar();
             user.addCar(car);
@@ -135,32 +156,27 @@ class CarIT {
             var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
             var carToMediaItem3 = buildCarToMediaItem(car, video, 1);
 
-            session.persist(user);
+            userRepository.save(user);
+            carRepository.save(car);
 
-            session.persist(image1);
-            session.persist(image2);
-            session.persist(video);
+            mediaItemRepository.save(image1);
+            mediaItemRepository.save(image2);
+            mediaItemRepository.save(video);
 
-            session.persist(carToMediaItem1);
-            session.persist(carToMediaItem2);
-            session.persist(carToMediaItem3);
+            carToMediaItemRepository.save(carToMediaItem1);
+            carToMediaItemRepository.save(carToMediaItem2);
+            carToMediaItemRepository.save(carToMediaItem3);
 
-            session.flush();
-            session.evict(car);
+            Optional<CarToMediaItem> carMedia1 =
+                    carToMediaItemRepository.findByCompositeId(car.getId(), image1.getId());
+            Optional<CarToMediaItem> carMedia2 =
+                    carToMediaItemRepository.findByCompositeId(car.getId(), image2.getId());
+            Optional<CarToMediaItem> carMedia3 =
+                    carToMediaItemRepository.findByCompositeId(car.getId(), video.getId());
 
-            Car carWithMediaItems = session.get(Car.class, car.getId());
-            List<CarToMediaItem> carMediaItems = carWithMediaItems.getCarToMediaItems();
-
-            Optional<CarToMediaItem> containImage1 = carMediaItems.stream()
-                    .filter(carToMediaItem -> carToMediaItem.getMediaItem().getId() == image1.getId()).findFirst();
-            Optional<CarToMediaItem> containImage2 = carMediaItems.stream()
-                    .filter(carToMediaItem -> carToMediaItem.getMediaItem().getId() == image2.getId()).findFirst();
-            Optional<CarToMediaItem> containVideo = carMediaItems.stream()
-                    .filter(carToMediaItem -> carToMediaItem.getMediaItem().getId() == video.getId()).findFirst();
-
-            assertTrue(containImage1.isPresent());
-            assertTrue(containImage2.isPresent());
-            assertTrue(containVideo.isPresent());
+            assertTrue(carMedia1.isPresent());
+            assertTrue(carMedia2.isPresent());
+            assertTrue(carMedia3.isPresent());
         }
 
         @Test
@@ -175,17 +191,20 @@ class CarIT {
             var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
             var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
 
-            session.persist(user);
+            userRepository.save(user);
+            carRepository.save(car);
 
-            session.persist(image1);
-            session.persist(image2);
+            mediaItemRepository.save(image1);
+            mediaItemRepository.save(image2);
 
-            session.persist(carToMediaItem1);
-            session.persist(carToMediaItem2);
+            carToMediaItemRepository.save(carToMediaItem1);
+            carToMediaItemRepository.save(carToMediaItem2);
 
             carToMediaItem1.setPosition(2);
             carToMediaItem2.setPosition(1);
-            session.flush();
+
+            carToMediaItemRepository.update(carToMediaItem1);
+            carToMediaItemRepository.update(carToMediaItem2);
 
             assertThat(carToMediaItem1.getPosition()).isEqualTo(2);
             assertThat(carToMediaItem2.getPosition()).isEqualTo(1);
@@ -205,26 +224,31 @@ class CarIT {
             var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
             var carToMediaItem3 = buildCarToMediaItem(car, video, 1);
 
-            session.persist(user);
+            userRepository.save(user);
+            carRepository.save(car);
 
-            session.persist(image1);
-            session.persist(image2);
-            session.persist(video);
+            mediaItemRepository.save(image1);
+            mediaItemRepository.save(image2);
+            mediaItemRepository.save(video);
 
-            session.persist(carToMediaItem1);
-            session.persist(carToMediaItem2);
-            session.persist(carToMediaItem3);
+            carToMediaItemRepository.save(carToMediaItem1);
+            carToMediaItemRepository.save(carToMediaItem2);
+            carToMediaItemRepository.save(carToMediaItem3);
 
-            session.remove(image1);
-            session.remove(image2);
-            session.remove(video);
+            carToMediaItemRepository.delete(carToMediaItem1);
+            carToMediaItemRepository.delete(carToMediaItem2);
+            carToMediaItemRepository.delete(carToMediaItem3);
 
-            session.flush();
-            session.evict(car);
+            Optional<CarToMediaItem> carMedia1 =
+                    carToMediaItemRepository.findByCompositeId(car.getId(), image1.getId());
+            Optional<CarToMediaItem> carMedia2 =
+                    carToMediaItemRepository.findByCompositeId(car.getId(), image2.getId());
+            Optional<CarToMediaItem> carMedia3 =
+                    carToMediaItemRepository.findByCompositeId(car.getId(), video.getId());
 
-            Car carWithoutMediaItems = session.get(Car.class, car.getId());
-
-            assertThat(carWithoutMediaItems.getCarToMediaItems()).isEmpty();
+            assertTrue(carMedia1.isEmpty());
+            assertTrue(carMedia2.isEmpty());
+            assertTrue(carMedia3.isEmpty());
         }
     }
 
