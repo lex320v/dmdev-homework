@@ -58,7 +58,7 @@ public class Request extends BaseEntity<Long> {
     private User client;
 
     @Builder.Default
-    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "request")
     private List<Feedback> feedbacks = new ArrayList<>();
 
     public void addFeedback(Feedback feedback) {

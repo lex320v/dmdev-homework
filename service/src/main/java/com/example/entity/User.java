@@ -85,7 +85,7 @@ public class User extends BaseEntitySoftDelete<Long> {
     private MediaItem avatarMediaItem;
 
     @Builder.Default
-    @OneToMany(mappedBy = "uploader", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "uploader")
     private List<MediaItem> mediaItems = new ArrayList<>();
 
     @Builder.Default
@@ -93,7 +93,7 @@ public class User extends BaseEntitySoftDelete<Long> {
     private List<Car> cars = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "client")
     private List<Request> requests = new ArrayList<>();
 
     public void setAvatar(MediaItem mediaItem) {

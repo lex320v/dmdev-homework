@@ -1,5 +1,7 @@
 package com.example;
 
+import com.example.dao.MediaItemRepository;
+import com.example.dao.UserRepository;
 import com.example.entity.MediaItem;
 import com.example.entity.User;
 import com.example.entity.enums.Gender;
@@ -15,12 +17,17 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MediaItemIT {
 
     private static SessionFactory sessionFactory;
     private static Session session;
+    private UserRepository userRepository;
+    private MediaItemRepository mediaItemRepository;
 
     @BeforeAll
     static void init() {
@@ -29,7 +36,9 @@ class MediaItemIT {
 
     @BeforeEach
     void prepare() {
-        session = sessionFactory.openSession();
+        session = sessionFactory.getCurrentSession();
+        userRepository = new UserRepository(session);
+        mediaItemRepository = new MediaItemRepository(session);
         session.beginTransaction();
     }
 
@@ -40,32 +49,23 @@ class MediaItemIT {
 
     @AfterAll
     static void closeSessionFactory() {
-        session.close();
         sessionFactory.close();
     }
 
     @Test
-    void createMediaItem() {
+    void createAndReadMediaItem() {
         var user = buildUser();
         var mediaItem = buildMediaItem();
         user.addMediaItem(mediaItem);
 
-        session.persist(user);
+        userRepository.save(user);
+        mediaItemRepository.save(mediaItem);
+        session.evict(mediaItem);
 
-        assertThat(user.getId()).isNotNull();
-    }
+        Optional<MediaItem> mediaItemFromDb = mediaItemRepository.findById(mediaItem.getId());
 
-    @Test
-    void readMediaItem() {
-        var user = buildUser();
-        var mediaItem = buildMediaItem();
-        user.addMediaItem(mediaItem);
-
-        session.persist(user);
-
-        var mediaItemFromDb = session.get(MediaItem.class, mediaItem.getId());
-
-        assertThat(mediaItemFromDb).isNotNull();
+        assertTrue(mediaItemFromDb.isPresent());
+        assertThat(mediaItemFromDb.get()).isEqualTo(mediaItem);
     }
 
     @Test
@@ -74,13 +74,13 @@ class MediaItemIT {
         var mediaItem = buildMediaItem();
         user.addMediaItem(mediaItem);
 
-        session.persist(user);
-        user.getMediaItems().remove(mediaItem);
-        session.remove(mediaItem);
+        userRepository.save(user);
+        mediaItemRepository.save(mediaItem);
+        mediaItemRepository.delete(mediaItem);
 
-        var mediaItemFromDb = session.get(MediaItem.class, mediaItem.getId());
+        var mediaItemFromDb = mediaItemRepository.findById(mediaItem.getId());
 
-        assertThat(mediaItemFromDb).isNull();
+        assertTrue(mediaItemFromDb.isEmpty());
     }
 
     private MediaItem buildMediaItem() {
