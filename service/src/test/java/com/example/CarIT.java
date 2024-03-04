@@ -6,6 +6,7 @@ import com.example.dao.MediaItemRepository;
 import com.example.dao.UserRepository;
 import com.example.entity.Car;
 import com.example.entity.CarToMediaItem;
+import com.example.entity.CarToMediaItemId;
 import com.example.entity.MediaItem;
 import com.example.entity.User;
 import com.example.entity.enums.CarType;
@@ -23,7 +24,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,8 +50,7 @@ class CarIT {
         userRepository = new UserRepository(session);
         carRepository = new CarRepository(session);
         mediaItemRepository = new MediaItemRepository(session);
-        carToMediaItemRepository =new CarToMediaItemRepository(session);
-        new MediaItemRepository(session);
+        carToMediaItemRepository = new CarToMediaItemRepository(session);
         session.beginTransaction();
     }
 
@@ -152,10 +151,6 @@ class CarIT {
             var image2 = buildMediaItem(MediaItemType.CAR_IMAGE, user);
             var video = buildMediaItem(MediaItemType.CAR_VIDEO, user);
 
-            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
-            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
-            var carToMediaItem3 = buildCarToMediaItem(car, video, 1);
-
             userRepository.save(user);
             carRepository.save(car);
 
@@ -163,16 +158,37 @@ class CarIT {
             mediaItemRepository.save(image2);
             mediaItemRepository.save(video);
 
+            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
+            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
+            var carToMediaItem3 = buildCarToMediaItem(car, video, 1);
+
             carToMediaItemRepository.save(carToMediaItem1);
             carToMediaItemRepository.save(carToMediaItem2);
             carToMediaItemRepository.save(carToMediaItem3);
+            session.flush();
+            session.evict(carToMediaItem1);
+            session.evict(carToMediaItem2);
+            session.evict(carToMediaItem3);
+
+            var key1 = CarToMediaItemId.builder()
+                    .carId(car.getId())
+                    .mediaItemId(image1.getId())
+                    .build();
+            var key2 = CarToMediaItemId.builder()
+                    .carId(car.getId())
+                    .mediaItemId(image2.getId())
+                    .build();
+            var key3 = CarToMediaItemId.builder()
+                    .carId(car.getId())
+                    .mediaItemId(video.getId())
+                    .build();
 
             Optional<CarToMediaItem> carMedia1 =
-                    carToMediaItemRepository.findByCompositeId(car.getId(), image1.getId());
+                    carToMediaItemRepository.findById(key1);
             Optional<CarToMediaItem> carMedia2 =
-                    carToMediaItemRepository.findByCompositeId(car.getId(), image2.getId());
+                    carToMediaItemRepository.findById(key2);
             Optional<CarToMediaItem> carMedia3 =
-                    carToMediaItemRepository.findByCompositeId(car.getId(), video.getId());
+                    carToMediaItemRepository.findById(key3);
 
             assertTrue(carMedia1.isPresent());
             assertTrue(carMedia2.isPresent());
@@ -188,28 +204,36 @@ class CarIT {
             var image1 = buildMediaItem(MediaItemType.CAR_IMAGE, user);
             var image2 = buildMediaItem(MediaItemType.CAR_IMAGE, user);
 
-            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
-            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
-
             userRepository.save(user);
             carRepository.save(car);
 
             mediaItemRepository.save(image1);
             mediaItemRepository.save(image2);
 
+            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
+            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
+
             carToMediaItemRepository.save(carToMediaItem1);
             carToMediaItemRepository.save(carToMediaItem2);
 
             carToMediaItem1.setPosition(2);
-            carToMediaItem2.setPosition(1);
-
             carToMediaItemRepository.update(carToMediaItem1);
+
+            carToMediaItem2.setPosition(1);
             carToMediaItemRepository.update(carToMediaItem2);
 
             session.evict(carToMediaItem1);
             session.evict(carToMediaItem2);
-            var ctmiFromDb1 = carToMediaItemRepository.findByCompositeId(car.getId(), image1.getId());
-            var ctmiFromDb2 = carToMediaItemRepository.findByCompositeId(car.getId(), image2.getId());
+            var key1 = CarToMediaItemId.builder()
+                    .carId(car.getId())
+                    .mediaItemId(image1.getId())
+                    .build();
+            var key2 = CarToMediaItemId.builder()
+                    .carId(car.getId())
+                    .mediaItemId(image2.getId())
+                    .build();
+            var ctmiFromDb1 = carToMediaItemRepository.findById(key1);
+            var ctmiFromDb2 = carToMediaItemRepository.findById(key2);
 
             assertTrue(ctmiFromDb1.isPresent());
             assertTrue(ctmiFromDb2.isPresent());
@@ -227,10 +251,6 @@ class CarIT {
             var image2 = buildMediaItem(MediaItemType.CAR_IMAGE, user);
             var video = buildMediaItem(MediaItemType.CAR_VIDEO, user);
 
-            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
-            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
-            var carToMediaItem3 = buildCarToMediaItem(car, video, 1);
-
             userRepository.save(user);
             carRepository.save(car);
 
@@ -238,20 +258,37 @@ class CarIT {
             mediaItemRepository.save(image2);
             mediaItemRepository.save(video);
 
+            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
+            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
+            var carToMediaItem3 = buildCarToMediaItem(car, video, 1);
+
             carToMediaItemRepository.save(carToMediaItem1);
             carToMediaItemRepository.save(carToMediaItem2);
             carToMediaItemRepository.save(carToMediaItem3);
+            session.flush();
 
             carToMediaItemRepository.delete(carToMediaItem1);
             carToMediaItemRepository.delete(carToMediaItem2);
             carToMediaItemRepository.delete(carToMediaItem3);
 
+            var key1 = CarToMediaItemId.builder()
+                    .carId(car.getId())
+                    .mediaItemId(image1.getId())
+                    .build();
+            var key2 = CarToMediaItemId.builder()
+                    .carId(car.getId())
+                    .mediaItemId(image2.getId())
+                    .build();
+            var key3 = CarToMediaItemId.builder()
+                    .carId(car.getId())
+                    .mediaItemId(video.getId())
+                    .build();
             Optional<CarToMediaItem> carMedia1 =
-                    carToMediaItemRepository.findByCompositeId(car.getId(), image1.getId());
+                    carToMediaItemRepository.findById(key1);
             Optional<CarToMediaItem> carMedia2 =
-                    carToMediaItemRepository.findByCompositeId(car.getId(), image2.getId());
+                    carToMediaItemRepository.findById(key2);
             Optional<CarToMediaItem> carMedia3 =
-                    carToMediaItemRepository.findByCompositeId(car.getId(), video.getId());
+                    carToMediaItemRepository.findById(key3);
 
             assertTrue(carMedia1.isEmpty());
             assertTrue(carMedia2.isEmpty());
@@ -293,10 +330,13 @@ class CarIT {
                 .build();
     }
 
-    private CarToMediaItem buildCarToMediaItem(Car car, MediaItem video, int position) {
+    private CarToMediaItem buildCarToMediaItem(Car car, MediaItem mediaItem, int position) {
+        var carToMediaItemId = CarToMediaItemId.builder()
+                .carId(car.getId())
+                .mediaItemId(mediaItem.getId())
+                .build();
         return CarToMediaItem.builder()
-                .car(car)
-                .mediaItem(video)
+                .id(carToMediaItemId)
                 .position(position)
                 .build();
     }

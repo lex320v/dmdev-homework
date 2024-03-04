@@ -1,7 +1,6 @@
 package com.example.entity;
 
 import com.example.entity.enums.CarType;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
