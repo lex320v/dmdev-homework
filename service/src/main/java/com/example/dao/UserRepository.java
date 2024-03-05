@@ -9,8 +9,10 @@ import java.util.List;
 
 import static com.example.entity.QUser.user;
 
-public class UserRepository extends BaseRepository<Long, User>{
+public class UserRepository extends BaseRepository<Long, User> {
+
     private final EntityManager entityManager;
+
     public UserRepository(EntityManager entityManager) {
         super(User.class, entityManager);
         this.entityManager = entityManager;

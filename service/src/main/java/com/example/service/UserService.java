@@ -35,7 +35,7 @@ public class UserService {
     @Transactional
     public <T> Optional<T> findById(Long id, Mapper<User, T> mapper) {
         Map<String, Object> properties = Map.of(
-                GraphSemantic.LOAD.getJakartaHintName(),
+                GraphSemantic.FETCH.getJakartaHintName(),
                 userRepository.getEntityManager().getEntityGraph("withPersonalInfo")
         );
         return userRepository.findById(id, properties).map(mapper::mapFrom);
