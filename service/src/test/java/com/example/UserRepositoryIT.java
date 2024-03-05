@@ -1,8 +1,8 @@
 package com.example;
 
-import com.example.dao.MediaItemRepository;
-import com.example.dao.PersonalInfoRepository;
-import com.example.dao.UserRepository;
+import com.example.repository.MediaItemRepository;
+import com.example.repository.PersonalInfoRepository;
+import com.example.repository.UserRepository;
 import com.example.dto.UserFilterDto;
 import com.example.entity.MediaItem;
 import com.example.entity.PersonalInfo;

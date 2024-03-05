@@ -1,9 +1,9 @@
 package com.example;
 
-import com.example.dao.CarRepository;
-import com.example.dao.FeedbackRepository;
-import com.example.dao.RequestRepository;
-import com.example.dao.UserRepository;
+import com.example.repository.CarRepository;
+import com.example.repository.FeedbackRepository;
+import com.example.repository.RequestRepository;
+import com.example.repository.UserRepository;
 import com.example.entity.Car;
 import com.example.entity.Feedback;
 import com.example.entity.Request;

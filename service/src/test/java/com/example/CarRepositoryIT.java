@@ -1,9 +1,9 @@
 package com.example;
 
-import com.example.dao.CarRepository;
-import com.example.dao.CarToMediaItemRepository;
-import com.example.dao.MediaItemRepository;
-import com.example.dao.UserRepository;
+import com.example.repository.CarRepository;
+import com.example.repository.CarToMediaItemRepository;
+import com.example.repository.MediaItemRepository;
+import com.example.repository.UserRepository;
 import com.example.entity.Car;
 import com.example.entity.CarToMediaItem;
 import com.example.entity.CarToMediaItemId;

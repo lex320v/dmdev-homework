@@ -1,7 +1,7 @@
 package com.example;
 
-import com.example.dao.MediaItemRepository;
-import com.example.dao.UserRepository;
+import com.example.repository.MediaItemRepository;
+import com.example.repository.UserRepository;
 import com.example.entity.MediaItem;
 import com.example.entity.User;
 import com.example.entity.enums.Gender;

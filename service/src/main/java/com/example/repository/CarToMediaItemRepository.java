@@ -1,4 +1,4 @@
-package com.example.dao;
+package com.example.repository;
 
 import com.example.entity.CarToMediaItem;
 import com.example.entity.CarToMediaItemId;
