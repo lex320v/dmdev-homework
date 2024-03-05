@@ -30,7 +30,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class UserIT {
+class UserRepositoryIT {
 
     private static SessionFactory sessionFactory;
     private static Session session;

@@ -26,7 +26,7 @@ import java.time.temporal.ChronoUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RequestIT {
+class RequestRepositoryIT {
 
     private static SessionFactory sessionFactory;
     private static Session session;

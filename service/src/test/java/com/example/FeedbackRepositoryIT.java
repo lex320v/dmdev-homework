@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FeedbackIT {
+class FeedbackRepositoryIT {
     private static SessionFactory sessionFactory;
     private static Session session;
     private UserRepository userRepository;
