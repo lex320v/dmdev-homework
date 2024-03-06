@@ -1,33 +1,31 @@
-package com.example.dao;
+package com.example.repository;
 
 import com.example.dto.UserFilterDto;
 import com.example.entity.User;
 import com.querydsl.jpa.impl.JPAQuery;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import org.hibernate.Session;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
 import static com.example.entity.QUser.user;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserQueryDslDao {
+public class UserRepository extends BaseRepository<Long, User> {
 
-    private static final UserQueryDslDao INSTANCE = new UserQueryDslDao();
+    private final EntityManager entityManager;
 
-    public static UserQueryDslDao getInstance() {
-        return INSTANCE;
+    public UserRepository(EntityManager entityManager) {
+        super(User.class, entityManager);
+        this.entityManager = entityManager;
     }
 
-    public List<User> findUsers(Session session, UserFilterDto userFilterDto) {
+    public List<User> findAll(UserFilterDto userFilterDto) {
         var predicate = QPredicate.builder()
                 .addLikeIgnoreCase(userFilterDto.getFirstname(), user.firstname::likeIgnoreCase)
                 .addLikeIgnoreCase(userFilterDto.getLastname(), user.lastname::likeIgnoreCase)
                 .addLikeIgnoreCase(userFilterDto.getUsername(), user.username::likeIgnoreCase)
                 .buildAnd();
 
-        var query = new JPAQuery<User>(session)
+        var query = new JPAQuery<User>(entityManager)
                 .select(user)
                 .from(user)
                 .where(predicate)

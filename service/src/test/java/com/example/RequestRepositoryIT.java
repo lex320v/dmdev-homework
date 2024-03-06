@@ -1,5 +1,8 @@
 package com.example;
 
+import com.example.repository.CarRepository;
+import com.example.repository.RequestRepository;
+import com.example.repository.UserRepository;
 import com.example.entity.Car;
 import com.example.entity.Request;
 import com.example.entity.User;
@@ -18,13 +21,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RequestIT {
+class RequestRepositoryIT {
 
     private static SessionFactory sessionFactory;
     private static Session session;
+    private UserRepository userRepository;
+    private CarRepository carRepository;
+    private RequestRepository requestRepository;
 
     @BeforeAll
     static void init() {
@@ -33,7 +41,10 @@ class RequestIT {
 
     @BeforeEach
     void prepare() {
-        session = sessionFactory.openSession();
+        session = sessionFactory.getCurrentSession();
+        userRepository = new UserRepository(session);
+        carRepository = new CarRepository(session);
+        requestRepository = new RequestRepository(session);
         session.beginTransaction();
     }
 
@@ -44,24 +55,24 @@ class RequestIT {
 
     @AfterAll
     static void closeSessionFactory() {
-        session.close();
         sessionFactory.close();
     }
 
     @Test
-    void createAndGetRequest() {
+    void createAndReadRequest() {
         var user = buildUser();
         var car = buildCar(user);
         var request = buildRequest(user, car);
 
-        session.persist(user);
-        session.persist(car);
-        session.persist(request);
+        userRepository.save(user);
+        carRepository.save(car);
+        requestRepository.save(request);
         session.evict(request);
 
-        Request requestFromDb = session.get(Request.class, request.getId());
+        var requestFromDb = requestRepository.findById(request.getId());
 
-        assertThat(requestFromDb).isNotNull();
+        assertTrue(requestFromDb.isPresent());
+        assertThat(requestFromDb.get()).isEqualTo(request);
     }
 
     @Test
@@ -70,24 +81,28 @@ class RequestIT {
         var car = buildCar(user);
         var request = buildRequest(user, car);
 
-        var updatedDateTime = LocalDateTime.now();
+        var updatedDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         var updatedStatus = RequestStatus.REJECTED;
         var updatedString = "updated value";
 
-        session.persist(user);
-        session.persist(car);
-        session.persist(request);
+        userRepository.save(user);
+        carRepository.save(car);
+        requestRepository.save(request);
 
         request.setDateTimeFrom(updatedDateTime);
         request.setDateTimeTo(updatedDateTime);
         request.setStatus(updatedStatus);
         request.setComment(updatedString);
-        session.flush();
+        requestRepository.update(request);
 
-        assertThat(request.getDateTimeFrom()).isEqualTo(updatedDateTime);
-        assertThat(request.getDateTimeTo()).isEqualTo(updatedDateTime);
-        assertThat(request.getStatus()).isEqualTo(updatedStatus);
-        assertThat(request.getComment()).isEqualTo(updatedString);
+        session.evict(request);
+        var requestFromDb = requestRepository.findById(request.getId());
+
+        assertTrue(requestFromDb.isPresent());
+        assertThat(requestFromDb.get().getDateTimeFrom()).isEqualTo(updatedDateTime);
+        assertThat(requestFromDb.get().getDateTimeTo()).isEqualTo(updatedDateTime);
+        assertThat(requestFromDb.get().getStatus()).isEqualTo(updatedStatus);
+        assertThat(requestFromDb.get().getComment()).isEqualTo(updatedString);
     }
 
     @Test
@@ -96,14 +111,14 @@ class RequestIT {
         var car = buildCar(user);
         var request = buildRequest(user, car);
 
-        session.persist(user);
-        session.persist(car);
-        session.persist(request);
-        session.remove(request);
+        userRepository.save(user);
+        carRepository.save(car);
+        requestRepository.save(request);
+        requestRepository.delete(request);
 
-        Request requestFromDb = session.get(Request.class, request.getId());
+        var requestFromDb = requestRepository.findById(request.getId());
 
-        assertThat(requestFromDb).isNull();
+        assertTrue(requestFromDb.isEmpty());
     }
 
     private User buildUser() {
@@ -133,8 +148,8 @@ class RequestIT {
 
     private Request buildRequest(User client, Car car) {
         return Request.builder()
-                .dateTimeFrom(LocalDateTime.now())
-                .dateTimeTo(LocalDateTime.now().plusHours(8))
+                .dateTimeFrom(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
+                .dateTimeTo(LocalDateTime.now().plusHours(8).truncatedTo(ChronoUnit.MICROS))
                 .client(client)
                 .car(car)
                 .status(RequestStatus.OPEN)

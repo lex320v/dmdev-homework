@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.dto.UserFilterDto;
 import com.example.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -12,8 +11,7 @@ public class Service {
     public static void main(String[] args) {
 
         try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
-             Session session = sessionFactory.openSession()
-        ) {
+             Session session = sessionFactory.openSession()) {
         }
     }
 }

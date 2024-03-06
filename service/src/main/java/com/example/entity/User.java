@@ -30,6 +30,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.ArrayList;
 import java.util.List;
 
+@NamedEntityGraph(name = "withPersonalInfo", attributeNodes = { @NamedAttributeNode("personalInfo") })
 @NamedEntityGraph(name = "withAvatarAndCar",
         attributeNodes = {
                 @NamedAttributeNode("avatarMediaItem"),
@@ -75,24 +76,24 @@ public class User extends BaseEntitySoftDelete<Long> {
     @Column(nullable = false)
     private UserStatus status;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, optional = false)
     private PersonalInfo personalInfo;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "avatar_media_item_id")
     private MediaItem avatarMediaItem;
 
     @Builder.Default
-    @OneToMany(mappedBy = "uploader", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "uploader")
     private List<MediaItem> mediaItems = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner")
     private List<Car> cars = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "client")
     private List<Request> requests = new ArrayList<>();
 
     public void setAvatar(MediaItem mediaItem) {

@@ -1,4 +1,4 @@
-package com.example.dao;
+package com.example.repository;
 
 import com.example.dto.UserFilterDto;
 import com.example.entity.User;

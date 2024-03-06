@@ -1,7 +1,6 @@
 package com.example.entity;
 
 import com.example.entity.enums.CarType;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -63,11 +62,11 @@ public class Car extends BaseEntity<Long> {
     private User owner;
 
     @Builder.Default
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "car")
     private List<Request> requests = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "car")
     private List<CarToMediaItem> carToMediaItems = new ArrayList<>();
 
     public void addRequest(Request request, User creator) {
