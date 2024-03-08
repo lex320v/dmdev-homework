@@ -1,9 +1,6 @@
 package com.example;
 
-import com.example.repository.CarRepository;
-import com.example.repository.CarToMediaItemRepository;
-import com.example.repository.MediaItemRepository;
-import com.example.repository.UserRepository;
+import com.example.config.ApplicationTestConfiguration;
 import com.example.entity.Car;
 import com.example.entity.CarToMediaItem;
 import com.example.entity.CarToMediaItemId;
@@ -14,15 +11,19 @@ import com.example.entity.enums.Gender;
 import com.example.entity.enums.MediaItemType;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
-import com.example.util.HibernateTestUtil;
+import com.example.repository.CarRepository;
+import com.example.repository.CarToMediaItemRepository;
+import com.example.repository.MediaItemRepository;
+import com.example.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Optional;
 
@@ -31,26 +32,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CarRepositoryIT {
 
-    private static SessionFactory sessionFactory;
+    private static AnnotationConfigApplicationContext context;
     private static Session session;
-    private UserRepository userRepository;
-    private CarRepository carRepository;
-    private MediaItemRepository mediaItemRepository;
-    private CarToMediaItemRepository carToMediaItemRepository;
+    private static UserRepository userRepository;
+    private static CarRepository carRepository;
+    private static MediaItemRepository mediaItemRepository;
+    private static CarToMediaItemRepository carToMediaItemRepository;
 
 
     @BeforeAll
     static void init() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
+        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
+        userRepository = context.getBean(UserRepository.class);
+        carRepository = context.getBean(CarRepository.class);
+        mediaItemRepository = context.getBean(MediaItemRepository.class);
+        carToMediaItemRepository = context.getBean(CarToMediaItemRepository.class);
+        session = (Session) context.getBean(EntityManager.class);
     }
 
     @BeforeEach
     void prepare() {
-        session = sessionFactory.getCurrentSession();
-        userRepository = new UserRepository(session);
-        carRepository = new CarRepository(session);
-        mediaItemRepository = new MediaItemRepository(session);
-        carToMediaItemRepository = new CarToMediaItemRepository(session);
         session.beginTransaction();
     }
 
@@ -61,7 +62,7 @@ class CarRepositoryIT {
 
     @AfterAll
     static void closeSessionFactory() {
-        sessionFactory.close();
+        context.close();
     }
 
     @Nested
