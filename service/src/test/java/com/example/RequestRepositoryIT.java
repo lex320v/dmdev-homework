@@ -37,10 +37,10 @@ class RequestRepositoryIT {
     @BeforeAll
     static void init() {
         context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
+        entityManager = context.getBean(EntityManager.class);
         userRepository = context.getBean(UserRepository.class);
         carRepository = context.getBean(CarRepository.class);
         requestRepository = context.getBean(RequestRepository.class);
-        entityManager = context.getBean(EntityManager.class);
     }
 
     @BeforeEach

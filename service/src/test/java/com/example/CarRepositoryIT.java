@@ -42,11 +42,11 @@ class CarRepositoryIT {
     @BeforeAll
     static void init() {
         context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
+        session = context.getBean(EntityManager.class);
         userRepository = context.getBean(UserRepository.class);
         carRepository = context.getBean(CarRepository.class);
         mediaItemRepository = context.getBean(MediaItemRepository.class);
         carToMediaItemRepository = context.getBean(CarToMediaItemRepository.class);
-        session = context.getBean(EntityManager.class);
     }
 
     @BeforeEach

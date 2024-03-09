@@ -41,10 +41,10 @@ class UserRepositoryIT {
     @BeforeAll
     static void init() {
         context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
+        entityManager = context.getBean(EntityManager.class);
         userRepository = context.getBean(UserRepository.class);
         personalInfoRepository = context.getBean(PersonalInfoRepository.class);
         mediaItemRepository = context.getBean(MediaItemRepository.class);
-        entityManager = context.getBean(EntityManager.class);
     }
 
     @BeforeEach
