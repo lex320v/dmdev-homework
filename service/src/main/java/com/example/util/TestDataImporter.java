@@ -80,7 +80,7 @@ public class TestDataImporter {
     private User saveUser(EntityManager entityManager, String username, String firstname, String lastname,
                           Gender gender, Role role) {
         var personalInfo = PersonalInfo.builder()
-                .dateOfBirth(LocalDate.of(randomInt(1990, 2000), randomInt(1, 12), randomInt(1, 29)))
+                .dateOfBirth(LocalDate.of(randomInt(1990, 2000), randomInt(1, 12), randomInt(1, 28)))
                 .build();
         var user = User.builder()
                 .username(username)
