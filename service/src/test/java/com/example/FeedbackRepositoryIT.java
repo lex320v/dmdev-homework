@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.config.ApplicationTestConfiguration;
 import com.example.entity.Car;
 import com.example.entity.Feedback;
 import com.example.entity.Request;
@@ -14,50 +13,27 @@ import com.example.repository.CarRepository;
 import com.example.repository.FeedbackRepository;
 import com.example.repository.RequestRepository;
 import com.example.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FeedbackRepositoryIT {
-    private static AnnotationConfigApplicationContext context;
-    private static EntityManager entityManager;
+class FeedbackRepositoryIT extends BaseIntegrationTest {
+
     private static UserRepository userRepository;
     private static CarRepository carRepository;
     private static RequestRepository requestRepository;
     private static FeedbackRepository feedbackRepository;
 
     @BeforeAll
-    static void init() {
-        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
-        entityManager = context.getBean(EntityManager.class);
+    static void getRepositories() {
         userRepository = context.getBean(UserRepository.class);
         carRepository = context.getBean(CarRepository.class);
         requestRepository = context.getBean(RequestRepository.class);
         feedbackRepository = context.getBean(FeedbackRepository.class);
-    }
-
-    @BeforeEach
-    void prepare() {
-        entityManager.getTransaction().begin();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        entityManager.getTransaction().rollback();
-    }
-
-    @AfterAll
-    static void closeSessionFactory() {
-        context.close();
     }
 
     @Test

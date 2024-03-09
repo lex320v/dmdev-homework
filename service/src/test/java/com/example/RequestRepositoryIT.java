@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.config.ApplicationTestConfiguration;
 import com.example.entity.Car;
 import com.example.entity.Request;
 import com.example.entity.User;
@@ -12,13 +11,8 @@ import com.example.entity.enums.UserStatus;
 import com.example.repository.CarRepository;
 import com.example.repository.RequestRepository;
 import com.example.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -26,36 +20,17 @@ import java.time.temporal.ChronoUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RequestRepositoryIT {
+class RequestRepositoryIT extends BaseIntegrationTest {
 
-    private static AnnotationConfigApplicationContext context;
-    private static EntityManager entityManager;
     private static UserRepository userRepository;
     private static CarRepository carRepository;
     private static RequestRepository requestRepository;
 
     @BeforeAll
-    static void init() {
-        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
-        entityManager = context.getBean(EntityManager.class);
+    static void getRepositories() {
         userRepository = context.getBean(UserRepository.class);
         carRepository = context.getBean(CarRepository.class);
         requestRepository = context.getBean(RequestRepository.class);
-    }
-
-    @BeforeEach
-    void prepare() {
-        entityManager.getTransaction().begin();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        entityManager.getTransaction().rollback();
-    }
-
-    @AfterAll
-    static void closeSessionFactory() {
-        context.close();
     }
 
     @Test

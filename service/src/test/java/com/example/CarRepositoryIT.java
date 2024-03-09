@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.config.ApplicationTestConfiguration;
 import com.example.entity.Car;
 import com.example.entity.CarToMediaItem;
 import com.example.entity.CarToMediaItemId;
@@ -15,53 +14,28 @@ import com.example.repository.CarRepository;
 import com.example.repository.CarToMediaItemRepository;
 import com.example.repository.MediaItemRepository;
 import com.example.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CarRepositoryIT {
+class CarRepositoryIT extends BaseIntegrationTest {
 
-    private static AnnotationConfigApplicationContext context;
-    private static EntityManager session;
     private static UserRepository userRepository;
     private static CarRepository carRepository;
     private static MediaItemRepository mediaItemRepository;
     private static CarToMediaItemRepository carToMediaItemRepository;
 
-
     @BeforeAll
-    static void init() {
-        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
-        session = context.getBean(EntityManager.class);
+    static void getRepositories() {
         userRepository = context.getBean(UserRepository.class);
         carRepository = context.getBean(CarRepository.class);
         mediaItemRepository = context.getBean(MediaItemRepository.class);
         carToMediaItemRepository = context.getBean(CarToMediaItemRepository.class);
-    }
-
-    @BeforeEach
-    void prepare() {
-        session.getTransaction().begin();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        session.getTransaction().rollback();
-    }
-
-    @AfterAll
-    static void closeSessionFactory() {
-        context.close();
     }
 
     @Nested
@@ -75,7 +49,7 @@ class CarRepositoryIT {
 
             userRepository.save(user);
             carRepository.save(car);
-            session.detach(car);
+            entityManager.detach(car);
 
             var carFromDb = carRepository.findById(car.getId());
 
@@ -108,7 +82,7 @@ class CarRepositoryIT {
 
             carRepository.update(car);
 
-            session.detach(car);
+            entityManager.detach(car);
             var carFromDb = carRepository.findById(car.getId());
 
             assertTrue(carFromDb.isPresent());
@@ -165,10 +139,10 @@ class CarRepositoryIT {
             carToMediaItemRepository.save(carToMediaItem1);
             carToMediaItemRepository.save(carToMediaItem2);
             carToMediaItemRepository.save(carToMediaItem3);
-            session.flush();
-            session.detach(carToMediaItem1);
-            session.detach(carToMediaItem2);
-            session.detach(carToMediaItem3);
+            entityManager.flush();
+            entityManager.detach(carToMediaItem1);
+            entityManager.detach(carToMediaItem2);
+            entityManager.detach(carToMediaItem3);
 
             var key1 = CarToMediaItemId.builder()
                     .carId(car.getId())
@@ -222,8 +196,8 @@ class CarRepositoryIT {
             carToMediaItem2.setPosition(1);
             carToMediaItemRepository.update(carToMediaItem2);
 
-            session.detach(carToMediaItem1);
-            session.detach(carToMediaItem2);
+            entityManager.detach(carToMediaItem1);
+            entityManager.detach(carToMediaItem2);
             var key1 = CarToMediaItemId.builder()
                     .carId(car.getId())
                     .mediaItemId(image1.getId())
@@ -265,7 +239,7 @@ class CarRepositoryIT {
             carToMediaItemRepository.save(carToMediaItem1);
             carToMediaItemRepository.save(carToMediaItem2);
             carToMediaItemRepository.save(carToMediaItem3);
-            session.flush();
+            entityManager.flush();
 
             carToMediaItemRepository.delete(carToMediaItem1);
             carToMediaItemRepository.delete(carToMediaItem2);

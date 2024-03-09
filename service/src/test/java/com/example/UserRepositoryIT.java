@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.config.ApplicationTestConfiguration;
 import com.example.dto.UserFilterDto;
 import com.example.entity.MediaItem;
 import com.example.entity.PersonalInfo;
@@ -14,14 +13,9 @@ import com.example.repository.MediaItemRepository;
 import com.example.repository.PersonalInfoRepository;
 import com.example.repository.UserRepository;
 import com.example.util.TestDataImporter;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,36 +24,17 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class UserRepositoryIT {
+class UserRepositoryIT extends BaseIntegrationTest {
 
-    private static AnnotationConfigApplicationContext context;
-    private static EntityManager entityManager;
     private static UserRepository userRepository;
     private static PersonalInfoRepository personalInfoRepository;
     private static MediaItemRepository mediaItemRepository;
 
     @BeforeAll
-    static void init() {
-        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
-        entityManager = context.getBean(EntityManager.class);
+    static void getRepositories() {
         userRepository = context.getBean(UserRepository.class);
         personalInfoRepository = context.getBean(PersonalInfoRepository.class);
         mediaItemRepository = context.getBean(MediaItemRepository.class);
-    }
-
-    @BeforeEach
-    public void prepare() {
-        entityManager.getTransaction().begin();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        entityManager.getTransaction().rollback();
-    }
-
-    @AfterAll
-    static void closeSessionFactory() {
-        context.close();
     }
 
     @Nested
