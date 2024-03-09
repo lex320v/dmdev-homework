@@ -1,21 +1,21 @@
 package com.example;
 
-import com.example.repository.MediaItemRepository;
-import com.example.repository.UserRepository;
+import com.example.config.ApplicationTestConfiguration;
 import com.example.entity.MediaItem;
 import com.example.entity.User;
 import com.example.entity.enums.Gender;
 import com.example.entity.enums.MediaItemType;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
-import com.example.util.HibernateTestUtil;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import com.example.repository.MediaItemRepository;
+import com.example.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Optional;
 
@@ -24,32 +24,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MediaItemRepositoryIT {
 
-    private static SessionFactory sessionFactory;
-    private static Session session;
-    private UserRepository userRepository;
-    private MediaItemRepository mediaItemRepository;
+    private static AnnotationConfigApplicationContext context;
+    private static EntityManager entityManager;
+    private static UserRepository userRepository;
+    private static MediaItemRepository mediaItemRepository;
 
     @BeforeAll
     static void init() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
+        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
+        entityManager = context.getBean(EntityManager.class);
+        userRepository = context.getBean(UserRepository.class);
+        mediaItemRepository = context.getBean(MediaItemRepository.class);
     }
 
     @BeforeEach
     void prepare() {
-        session = sessionFactory.getCurrentSession();
-        userRepository = new UserRepository(session);
-        mediaItemRepository = new MediaItemRepository(session);
-        session.beginTransaction();
+        entityManager.getTransaction().begin();
     }
 
     @AfterEach
     void closeConnection() {
-        session.getTransaction().rollback();
+        entityManager.getTransaction().rollback();
     }
 
     @AfterAll
     static void closeSessionFactory() {
-        sessionFactory.close();
+        context.close();
     }
 
     @Test
@@ -60,7 +60,7 @@ class MediaItemRepositoryIT {
 
         userRepository.save(user);
         mediaItemRepository.save(mediaItem);
-        session.evict(mediaItem);
+        entityManager.detach(mediaItem);
 
         Optional<MediaItem> mediaItemFromDb = mediaItemRepository.findById(mediaItem.getId());
 

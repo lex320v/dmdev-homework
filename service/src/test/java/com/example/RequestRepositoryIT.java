@@ -1,8 +1,6 @@
 package com.example;
 
-import com.example.repository.CarRepository;
-import com.example.repository.RequestRepository;
-import com.example.repository.UserRepository;
+import com.example.config.ApplicationTestConfiguration;
 import com.example.entity.Car;
 import com.example.entity.Request;
 import com.example.entity.User;
@@ -11,14 +9,16 @@ import com.example.entity.enums.Gender;
 import com.example.entity.enums.RequestStatus;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
-import com.example.util.HibernateTestUtil;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import com.example.repository.CarRepository;
+import com.example.repository.RequestRepository;
+import com.example.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -28,34 +28,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RequestRepositoryIT {
 
-    private static SessionFactory sessionFactory;
-    private static Session session;
-    private UserRepository userRepository;
-    private CarRepository carRepository;
-    private RequestRepository requestRepository;
+    private static AnnotationConfigApplicationContext context;
+    private static EntityManager entityManager;
+    private static UserRepository userRepository;
+    private static CarRepository carRepository;
+    private static RequestRepository requestRepository;
 
     @BeforeAll
     static void init() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
+        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
+        userRepository = context.getBean(UserRepository.class);
+        carRepository = context.getBean(CarRepository.class);
+        requestRepository = context.getBean(RequestRepository.class);
+        entityManager = context.getBean(EntityManager.class);
     }
 
     @BeforeEach
     void prepare() {
-        session = sessionFactory.getCurrentSession();
-        userRepository = new UserRepository(session);
-        carRepository = new CarRepository(session);
-        requestRepository = new RequestRepository(session);
-        session.beginTransaction();
+        entityManager.getTransaction().begin();
     }
 
     @AfterEach
     void closeConnection() {
-        session.getTransaction().rollback();
+        entityManager.getTransaction().rollback();
     }
 
     @AfterAll
     static void closeSessionFactory() {
-        sessionFactory.close();
+        context.close();
     }
 
     @Test
@@ -67,7 +67,7 @@ class RequestRepositoryIT {
         userRepository.save(user);
         carRepository.save(car);
         requestRepository.save(request);
-        session.evict(request);
+        entityManager.detach(request);
 
         var requestFromDb = requestRepository.findById(request.getId());
 
@@ -95,7 +95,7 @@ class RequestRepositoryIT {
         request.setComment(updatedString);
         requestRepository.update(request);
 
-        session.evict(request);
+        entityManager.detach(request);
         var requestFromDb = requestRepository.findById(request.getId());
 
         assertTrue(requestFromDb.isPresent());

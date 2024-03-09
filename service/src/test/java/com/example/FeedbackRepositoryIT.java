@@ -1,9 +1,6 @@
 package com.example;
 
-import com.example.repository.CarRepository;
-import com.example.repository.FeedbackRepository;
-import com.example.repository.RequestRepository;
-import com.example.repository.UserRepository;
+import com.example.config.ApplicationTestConfiguration;
 import com.example.entity.Car;
 import com.example.entity.Feedback;
 import com.example.entity.Request;
@@ -13,14 +10,17 @@ import com.example.entity.enums.Gender;
 import com.example.entity.enums.RequestStatus;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
-import com.example.util.HibernateTestUtil;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import com.example.repository.CarRepository;
+import com.example.repository.FeedbackRepository;
+import com.example.repository.RequestRepository;
+import com.example.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.LocalDateTime;
 
@@ -28,36 +28,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FeedbackRepositoryIT {
-    private static SessionFactory sessionFactory;
-    private static Session session;
-    private UserRepository userRepository;
-    private CarRepository carRepository;
-    private RequestRepository requestRepository;
-    private FeedbackRepository feedbackRepository;
+    private static AnnotationConfigApplicationContext context;
+    private static EntityManager entityManager;
+    private static UserRepository userRepository;
+    private static CarRepository carRepository;
+    private static RequestRepository requestRepository;
+    private static FeedbackRepository feedbackRepository;
 
     @BeforeAll
     static void init() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
+        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
+        entityManager = context.getBean(EntityManager.class);
+        userRepository = context.getBean(UserRepository.class);
+        carRepository = context.getBean(CarRepository.class);
+        requestRepository = context.getBean(RequestRepository.class);
+        feedbackRepository = context.getBean(FeedbackRepository.class);
     }
 
     @BeforeEach
     void prepare() {
-        session = sessionFactory.getCurrentSession();
-        userRepository = new UserRepository(session);
-        carRepository = new CarRepository(session);
-        requestRepository = new RequestRepository(session);
-        feedbackRepository = new FeedbackRepository(session);
-        session.beginTransaction();
+        entityManager.getTransaction().begin();
     }
 
     @AfterEach
     void closeConnection() {
-        session.getTransaction().rollback();
+        entityManager.getTransaction().rollback();
     }
 
     @AfterAll
     static void closeSessionFactory() {
-        sessionFactory.close();
+        context.close();
     }
 
     @Test
@@ -76,7 +76,7 @@ class FeedbackRepositoryIT {
         carRepository.save(car);
         requestRepository.save(request);
         feedbackRepository.save(feedback);
-        session.evict(feedback);
+        entityManager.detach(feedback);
 
         var feedbackFromDb = feedbackRepository.findById(feedback.getId());
 
@@ -108,7 +108,7 @@ class FeedbackRepositoryIT {
         feedback.setRating(updatedInteger);
         feedbackRepository.update(feedback);
 
-        session.evict(feedback);
+        entityManager.detach(feedback);
         var feedbackFromDb = feedbackRepository.findById(feedback.getId());
 
         assertTrue(feedbackFromDb.isPresent());
