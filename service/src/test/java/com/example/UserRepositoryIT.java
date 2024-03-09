@@ -1,8 +1,6 @@
 package com.example;
 
-import com.example.repository.MediaItemRepository;
-import com.example.repository.PersonalInfoRepository;
-import com.example.repository.UserRepository;
+import com.example.config.ApplicationTestConfiguration;
 import com.example.dto.UserFilterDto;
 import com.example.entity.MediaItem;
 import com.example.entity.PersonalInfo;
@@ -12,16 +10,18 @@ import com.example.entity.enums.Gender;
 import com.example.entity.enums.MediaItemType;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
-import com.example.util.HibernateTestUtil;
+import com.example.repository.MediaItemRepository;
+import com.example.repository.PersonalInfoRepository;
+import com.example.repository.UserRepository;
 import com.example.util.TestDataImporter;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,35 +32,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserRepositoryIT {
 
-    private static SessionFactory sessionFactory;
-    private static Session session;
-
-    private UserRepository userRepository;
-    private PersonalInfoRepository personalInfoRepository;
-    private MediaItemRepository mediaItemRepository;
+    private static AnnotationConfigApplicationContext context;
+    private static EntityManager entityManager;
+    private static UserRepository userRepository;
+    private static PersonalInfoRepository personalInfoRepository;
+    private static MediaItemRepository mediaItemRepository;
 
     @BeforeAll
     static void init() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
+        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
+        userRepository = context.getBean(UserRepository.class);
+        personalInfoRepository = context.getBean(PersonalInfoRepository.class);
+        mediaItemRepository = context.getBean(MediaItemRepository.class);
+        entityManager = context.getBean(EntityManager.class);
     }
 
     @BeforeEach
     public void prepare() {
-        session = sessionFactory.getCurrentSession();
-        userRepository = new UserRepository(session);
-        personalInfoRepository = new PersonalInfoRepository(session);
-        mediaItemRepository = new MediaItemRepository(session);
-        session.beginTransaction();
+        entityManager.getTransaction().begin();
     }
 
     @AfterEach
     void closeConnection() {
-        session.getTransaction().rollback();
+        entityManager.getTransaction().rollback();
     }
 
     @AfterAll
     static void closeSessionFactory() {
-        sessionFactory.close();
+        context.close();
     }
 
     @Nested
@@ -70,7 +69,7 @@ class UserRepositoryIT {
             var user = buildUser("lex1", "firstname_lex", "lastname_lex");
             userRepository.save(user);
 
-            session.evict(user);
+            entityManager.detach(user);
             var userFromDb = userRepository.findById(user.getId());
 
             assertTrue(userFromDb.isPresent());
@@ -95,7 +94,7 @@ class UserRepositoryIT {
             user.setPassword(updatedString);
             userRepository.update(user);
 
-            session.evict(user);
+            entityManager.detach(user);
             var userFromDb = userRepository.findById(user.getId());
 
             assertTrue(userFromDb.isPresent());
@@ -171,7 +170,7 @@ class UserRepositoryIT {
 
         @Test
         void findAllWithLimit() {
-            TestDataImporter.importData(session);
+            TestDataImporter.importData(entityManager);
 
             UserFilterDto userFilterDto = UserFilterDto.builder().limit(5).build();
 
@@ -191,8 +190,8 @@ class UserRepositoryIT {
             userRepository.save(user);
             personalInfo.setUser(user);
             personalInfoRepository.save(personalInfo);
-            session.flush();
-            session.evict(personalInfo);
+            entityManager.flush();
+            entityManager.detach(personalInfo);
 
             Optional<PersonalInfo> personalInfoFromDb = personalInfoRepository.findById(personalInfo.getId());
 
@@ -212,7 +211,7 @@ class UserRepositoryIT {
             userRepository.save(user);
             personalInfo.setUser(user);
             personalInfoRepository.save(personalInfo);
-            session.flush();
+            entityManager.flush();
 
             personalInfo.setDriverLicenseName(updatedString);
             personalInfo.setDriverLicenseSurname(updatedString);
@@ -226,7 +225,7 @@ class UserRepositoryIT {
             personalInfo.setDriverLicenseCategories(updatedCategories);
             personalInfoRepository.update(personalInfo);
 
-            session.evict(personalInfo);
+            entityManager.detach(personalInfo);
             var personalInfoFromDb = personalInfoRepository.findById(personalInfo.getId());
 
             assertTrue(personalInfoFromDb.isPresent());
@@ -272,7 +271,7 @@ class UserRepositoryIT {
             mediaItemRepository.save(avatar);
             user.setAvatar(avatar);
             userRepository.update(user);
-            session.evict(user);
+            entityManager.detach(user);
 
             var userWithAvatar = userRepository.findById(user.getId());
 
@@ -296,7 +295,7 @@ class UserRepositoryIT {
             mediaItemRepository.save(updated_avatar);
             user.setAvatar(updated_avatar);
             userRepository.update(user);
-            session.evict(user);
+            entityManager.detach(user);
 
             mediaItemRepository.delete(avatar);
 
