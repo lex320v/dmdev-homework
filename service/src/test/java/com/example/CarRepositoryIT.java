@@ -16,7 +16,6 @@ import com.example.repository.CarToMediaItemRepository;
 import com.example.repository.MediaItemRepository;
 import com.example.repository.UserRepository;
 import jakarta.persistence.EntityManager;
-import org.hibernate.Session;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CarRepositoryIT {
 
     private static AnnotationConfigApplicationContext context;
-    private static Session session;
+    private static EntityManager session;
     private static UserRepository userRepository;
     private static CarRepository carRepository;
     private static MediaItemRepository mediaItemRepository;
@@ -47,12 +46,12 @@ class CarRepositoryIT {
         carRepository = context.getBean(CarRepository.class);
         mediaItemRepository = context.getBean(MediaItemRepository.class);
         carToMediaItemRepository = context.getBean(CarToMediaItemRepository.class);
-        session = (Session) context.getBean(EntityManager.class);
+        session = context.getBean(EntityManager.class);
     }
 
     @BeforeEach
     void prepare() {
-        session.beginTransaction();
+        session.getTransaction().begin();
     }
 
     @AfterEach
@@ -76,7 +75,7 @@ class CarRepositoryIT {
 
             userRepository.save(user);
             carRepository.save(car);
-            session.evict(car);
+            session.detach(car);
 
             var carFromDb = carRepository.findById(car.getId());
 
@@ -109,7 +108,7 @@ class CarRepositoryIT {
 
             carRepository.update(car);
 
-            session.evict(car);
+            session.detach(car);
             var carFromDb = carRepository.findById(car.getId());
 
             assertTrue(carFromDb.isPresent());
@@ -167,9 +166,9 @@ class CarRepositoryIT {
             carToMediaItemRepository.save(carToMediaItem2);
             carToMediaItemRepository.save(carToMediaItem3);
             session.flush();
-            session.evict(carToMediaItem1);
-            session.evict(carToMediaItem2);
-            session.evict(carToMediaItem3);
+            session.detach(carToMediaItem1);
+            session.detach(carToMediaItem2);
+            session.detach(carToMediaItem3);
 
             var key1 = CarToMediaItemId.builder()
                     .carId(car.getId())
@@ -223,8 +222,8 @@ class CarRepositoryIT {
             carToMediaItem2.setPosition(1);
             carToMediaItemRepository.update(carToMediaItem2);
 
-            session.evict(carToMediaItem1);
-            session.evict(carToMediaItem2);
+            session.detach(carToMediaItem1);
+            session.detach(carToMediaItem2);
             var key1 = CarToMediaItemId.builder()
                     .carId(car.getId())
                     .mediaItemId(image1.getId())

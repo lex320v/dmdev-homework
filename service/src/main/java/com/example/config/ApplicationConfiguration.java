@@ -16,15 +16,19 @@ import java.lang.reflect.Proxy;
 @ComponentScan(basePackages = "com.example")
 public class ApplicationConfiguration {
 
+    @Bean(destroyMethod = "close")
+    public SessionFactory sessionFactory() {
+        return HibernateUtil.buildSessionFactory();
+    }
+
     @Bean
-    public EntityManager entityManager() {
-        var sessionFactory = HibernateUtil.buildSessionFactory();
-        var session = (Session) Proxy.newProxyInstance(
+    public EntityManager entityManager(SessionFactory sessionFactory) {
+        var session = Proxy.newProxyInstance(
                 SessionFactory.class.getClassLoader(),
                 new Class[]{Session.class},
                 (proxy, method, args1) -> method.invoke(sessionFactory.getCurrentSession(), args1)
         );
 
-        return session;
+        return (EntityManager) session;
     }
 }
