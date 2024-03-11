@@ -1,8 +1,5 @@
 package com.example;
 
-import com.example.repository.CarRepository;
-import com.example.repository.RequestRepository;
-import com.example.repository.UserRepository;
 import com.example.entity.Car;
 import com.example.entity.Request;
 import com.example.entity.User;
@@ -11,13 +8,10 @@ import com.example.entity.enums.Gender;
 import com.example.entity.enums.RequestStatus;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
-import com.example.util.HibernateTestUtil;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
+import com.example.repository.CarRepository;
+import com.example.repository.RequestRepository;
+import com.example.repository.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -26,36 +20,17 @@ import java.time.temporal.ChronoUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RequestRepositoryIT {
+class RequestRepositoryIT extends BaseIntegrationTest {
 
-    private static SessionFactory sessionFactory;
-    private static Session session;
-    private UserRepository userRepository;
-    private CarRepository carRepository;
-    private RequestRepository requestRepository;
+    private static UserRepository userRepository;
+    private static CarRepository carRepository;
+    private static RequestRepository requestRepository;
 
     @BeforeAll
-    static void init() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
-    }
-
-    @BeforeEach
-    void prepare() {
-        session = sessionFactory.getCurrentSession();
-        userRepository = new UserRepository(session);
-        carRepository = new CarRepository(session);
-        requestRepository = new RequestRepository(session);
-        session.beginTransaction();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        session.getTransaction().rollback();
-    }
-
-    @AfterAll
-    static void closeSessionFactory() {
-        sessionFactory.close();
+    static void getRepositories() {
+        userRepository = context.getBean(UserRepository.class);
+        carRepository = context.getBean(CarRepository.class);
+        requestRepository = context.getBean(RequestRepository.class);
     }
 
     @Test
@@ -67,7 +42,7 @@ class RequestRepositoryIT {
         userRepository.save(user);
         carRepository.save(car);
         requestRepository.save(request);
-        session.evict(request);
+        entityManager.detach(request);
 
         var requestFromDb = requestRepository.findById(request.getId());
 
@@ -95,7 +70,7 @@ class RequestRepositoryIT {
         request.setComment(updatedString);
         requestRepository.update(request);
 
-        session.evict(request);
+        entityManager.detach(request);
         var requestFromDb = requestRepository.findById(request.getId());
 
         assertTrue(requestFromDb.isPresent());

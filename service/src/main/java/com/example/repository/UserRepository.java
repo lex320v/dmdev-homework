@@ -4,11 +4,13 @@ import com.example.dto.UserFilterDto;
 import com.example.entity.User;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 import static com.example.entity.QUser.user;
 
+@Repository
 public class UserRepository extends BaseRepository<Long, User> {
 
     private final EntityManager entityManager;

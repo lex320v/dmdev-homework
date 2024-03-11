@@ -1,9 +1,5 @@
 package com.example;
 
-import com.example.repository.CarRepository;
-import com.example.repository.CarToMediaItemRepository;
-import com.example.repository.MediaItemRepository;
-import com.example.repository.UserRepository;
 import com.example.entity.Car;
 import com.example.entity.CarToMediaItem;
 import com.example.entity.CarToMediaItemId;
@@ -14,13 +10,11 @@ import com.example.entity.enums.Gender;
 import com.example.entity.enums.MediaItemType;
 import com.example.entity.enums.Role;
 import com.example.entity.enums.UserStatus;
-import com.example.util.HibernateTestUtil;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
+import com.example.repository.CarRepository;
+import com.example.repository.CarToMediaItemRepository;
+import com.example.repository.MediaItemRepository;
+import com.example.repository.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -29,39 +23,19 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CarRepositoryIT {
+class CarRepositoryIT extends BaseIntegrationTest {
 
-    private static SessionFactory sessionFactory;
-    private static Session session;
-    private UserRepository userRepository;
-    private CarRepository carRepository;
-    private MediaItemRepository mediaItemRepository;
-    private CarToMediaItemRepository carToMediaItemRepository;
-
+    private static UserRepository userRepository;
+    private static CarRepository carRepository;
+    private static MediaItemRepository mediaItemRepository;
+    private static CarToMediaItemRepository carToMediaItemRepository;
 
     @BeforeAll
-    static void init() {
-        sessionFactory = HibernateTestUtil.buildSessionFactory();
-    }
-
-    @BeforeEach
-    void prepare() {
-        session = sessionFactory.getCurrentSession();
-        userRepository = new UserRepository(session);
-        carRepository = new CarRepository(session);
-        mediaItemRepository = new MediaItemRepository(session);
-        carToMediaItemRepository = new CarToMediaItemRepository(session);
-        session.beginTransaction();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        session.getTransaction().rollback();
-    }
-
-    @AfterAll
-    static void closeSessionFactory() {
-        sessionFactory.close();
+    static void getRepositories() {
+        userRepository = context.getBean(UserRepository.class);
+        carRepository = context.getBean(CarRepository.class);
+        mediaItemRepository = context.getBean(MediaItemRepository.class);
+        carToMediaItemRepository = context.getBean(CarToMediaItemRepository.class);
     }
 
     @Nested
@@ -75,7 +49,7 @@ class CarRepositoryIT {
 
             userRepository.save(user);
             carRepository.save(car);
-            session.evict(car);
+            entityManager.detach(car);
 
             var carFromDb = carRepository.findById(car.getId());
 
@@ -108,7 +82,7 @@ class CarRepositoryIT {
 
             carRepository.update(car);
 
-            session.evict(car);
+            entityManager.detach(car);
             var carFromDb = carRepository.findById(car.getId());
 
             assertTrue(carFromDb.isPresent());
@@ -165,10 +139,10 @@ class CarRepositoryIT {
             carToMediaItemRepository.save(carToMediaItem1);
             carToMediaItemRepository.save(carToMediaItem2);
             carToMediaItemRepository.save(carToMediaItem3);
-            session.flush();
-            session.evict(carToMediaItem1);
-            session.evict(carToMediaItem2);
-            session.evict(carToMediaItem3);
+            entityManager.flush();
+            entityManager.detach(carToMediaItem1);
+            entityManager.detach(carToMediaItem2);
+            entityManager.detach(carToMediaItem3);
 
             var key1 = CarToMediaItemId.builder()
                     .carId(car.getId())
@@ -222,8 +196,8 @@ class CarRepositoryIT {
             carToMediaItem2.setPosition(1);
             carToMediaItemRepository.update(carToMediaItem2);
 
-            session.evict(carToMediaItem1);
-            session.evict(carToMediaItem2);
+            entityManager.detach(carToMediaItem1);
+            entityManager.detach(carToMediaItem2);
             var key1 = CarToMediaItemId.builder()
                     .carId(car.getId())
                     .mediaItemId(image1.getId())
@@ -265,7 +239,7 @@ class CarRepositoryIT {
             carToMediaItemRepository.save(carToMediaItem1);
             carToMediaItemRepository.save(carToMediaItem2);
             carToMediaItemRepository.save(carToMediaItem3);
-            session.flush();
+            entityManager.flush();
 
             carToMediaItemRepository.delete(carToMediaItem1);
             carToMediaItemRepository.delete(carToMediaItem2);
