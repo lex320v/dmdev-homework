@@ -21,12 +21,10 @@ public class ApplicationConfiguration {
 
     @Bean
     public EntityManager entityManager(SessionFactory sessionFactory) {
-        var session = Proxy.newProxyInstance(
+        return (EntityManager) Proxy.newProxyInstance(
                 SessionFactory.class.getClassLoader(),
                 new Class[]{Session.class},
                 (proxy, method, args1) -> method.invoke(sessionFactory.getCurrentSession(), args1)
         );
-
-        return (EntityManager) session;
     }
 }
