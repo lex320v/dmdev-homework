@@ -27,7 +27,7 @@ class RequestRepositoryIT extends BaseIntegrationTest {
     private static RequestRepository requestRepository;
 
     @BeforeAll
-    static void getRepositories() {
+    static void initRepositories() {
         userRepository = context.getBean(UserRepository.class);
         carRepository = context.getBean(CarRepository.class);
         requestRepository = context.getBean(RequestRepository.class);

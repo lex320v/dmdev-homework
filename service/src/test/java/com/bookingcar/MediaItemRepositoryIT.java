@@ -22,7 +22,7 @@ class MediaItemRepositoryIT extends BaseIntegrationTest {
     private static MediaItemRepository mediaItemRepository;
 
     @BeforeAll
-    static void getRepositories() {
+    static void initRepositories() {
         userRepository = context.getBean(UserRepository.class);
         mediaItemRepository = context.getBean(MediaItemRepository.class);
     }

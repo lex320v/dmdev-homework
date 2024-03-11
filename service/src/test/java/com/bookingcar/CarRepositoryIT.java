@@ -31,7 +31,7 @@ class CarRepositoryIT extends BaseIntegrationTest {
     private static CarToMediaItemRepository carToMediaItemRepository;
 
     @BeforeAll
-    static void getRepositories() {
+    static void initRepositories() {
         userRepository = context.getBean(UserRepository.class);
         carRepository = context.getBean(CarRepository.class);
         mediaItemRepository = context.getBean(MediaItemRepository.class);

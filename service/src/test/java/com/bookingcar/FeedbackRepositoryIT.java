@@ -29,7 +29,7 @@ class FeedbackRepositoryIT extends BaseIntegrationTest {
     private static FeedbackRepository feedbackRepository;
 
     @BeforeAll
-    static void getRepositories() {
+    static void initRepositories() {
         userRepository = context.getBean(UserRepository.class);
         carRepository = context.getBean(CarRepository.class);
         requestRepository = context.getBean(RequestRepository.class);
