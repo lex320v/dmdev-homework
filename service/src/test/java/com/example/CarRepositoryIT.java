@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.annotation.IT;
 import com.example.entity.Car;
 import com.example.entity.CarToMediaItem;
 import com.example.entity.CarToMediaItemId;
@@ -14,7 +15,10 @@ import com.example.repository.CarRepository;
 import com.example.repository.CarToMediaItemRepository;
 import com.example.repository.MediaItemRepository;
 import com.example.repository.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -23,19 +27,25 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CarRepositoryIT extends BaseIntegrationTest {
+@IT
+@RequiredArgsConstructor
+class CarRepositoryIT {
 
-    private static UserRepository userRepository;
-    private static CarRepository carRepository;
-    private static MediaItemRepository mediaItemRepository;
-    private static CarToMediaItemRepository carToMediaItemRepository;
+    private final EntityManager entityManager;
+    private final UserRepository userRepository;
+    private final CarRepository carRepository;
+    private final MediaItemRepository mediaItemRepository;
+    private final CarToMediaItemRepository carToMediaItemRepository;
 
-    @BeforeAll
-    static void getRepositories() {
-        userRepository = context.getBean(UserRepository.class);
-        carRepository = context.getBean(CarRepository.class);
-        mediaItemRepository = context.getBean(MediaItemRepository.class);
-        carToMediaItemRepository = context.getBean(CarToMediaItemRepository.class);
+
+    @BeforeEach
+    void prepare() {
+        entityManager.getTransaction().begin();
+    }
+
+    @AfterEach
+    void closeConnection() {
+        entityManager.getTransaction().rollback();
     }
 
     @Nested

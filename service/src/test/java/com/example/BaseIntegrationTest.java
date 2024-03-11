@@ -1,6 +1,6 @@
 package com.example;
 
-import com.example.config.ApplicationTestConfiguration;
+//import com.example.config.ApplicationTestConfiguration;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -15,7 +15,7 @@ abstract class BaseIntegrationTest {
 
     @BeforeAll
     static void init() {
-        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
+//        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
         entityManager = context.getBean(EntityManager.class);
     }
 
