@@ -5,13 +5,11 @@ import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import java.lang.reflect.Proxy;
 
 @Configuration
-@ComponentScan(basePackages = "com.example")
 public class ApplicationConfiguration {
 
     @Bean(destroyMethod = "close")

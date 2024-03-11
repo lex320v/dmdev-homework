@@ -1,17 +1,26 @@
 package com.example;
 
-import com.example.util.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import com.example.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@SpringBootApplication
 public class Service {
 
     private final static Common common = new Common();
 
     public static void main(String[] args) {
 
-        try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
-             Session session = sessionFactory.openSession()) {
-        }
+        var context = SpringApplication.run(Service.class, args);
+
+        var entityManager = context.getBean(EntityManager.class);
+        var userRepository = context.getBean(UserRepository.class);
+        entityManager.getTransaction().begin();
+        var t = userRepository.findAll();
+
+        System.out.println(t);
+
+        entityManager.getTransaction().commit();
     }
 }
