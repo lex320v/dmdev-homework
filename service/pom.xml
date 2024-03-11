@@ -89,7 +89,7 @@
                             <descriptorRefs>jar-with-dependencies</descriptorRefs>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.example.Service</mainClass>
+                                    <mainClass>com.bookingcar.Service</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
