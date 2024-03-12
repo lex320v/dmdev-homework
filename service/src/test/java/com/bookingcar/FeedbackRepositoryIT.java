@@ -1,5 +1,6 @@
 package com.bookingcar;
 
+import com.bookingcar.annotation.IT;
 import com.bookingcar.entity.Car;
 import com.bookingcar.entity.Feedback;
 import com.bookingcar.entity.Request;
@@ -13,7 +14,10 @@ import com.bookingcar.repository.CarRepository;
 import com.bookingcar.repository.FeedbackRepository;
 import com.bookingcar.repository.RequestRepository;
 import com.bookingcar.repository.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -21,19 +25,24 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FeedbackRepositoryIT extends BaseIntegrationTest {
+@IT
+@RequiredArgsConstructor
+class FeedbackRepositoryIT {
 
-    private static UserRepository userRepository;
-    private static CarRepository carRepository;
-    private static RequestRepository requestRepository;
-    private static FeedbackRepository feedbackRepository;
+    private final EntityManager entityManager;
+    private final UserRepository userRepository;
+    private final CarRepository carRepository;
+    private final RequestRepository requestRepository;
+    private final FeedbackRepository feedbackRepository;
 
-    @BeforeAll
-    static void initRepositories() {
-        userRepository = context.getBean(UserRepository.class);
-        carRepository = context.getBean(CarRepository.class);
-        requestRepository = context.getBean(RequestRepository.class);
-        feedbackRepository = context.getBean(FeedbackRepository.class);
+    @BeforeEach
+    void prepare() {
+        entityManager.getTransaction().begin();
+    }
+
+    @AfterEach
+    void closeConnection() {
+        entityManager.getTransaction().rollback();
     }
 
     @Test

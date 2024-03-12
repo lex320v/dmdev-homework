@@ -37,7 +37,6 @@ class CarRepositoryIT {
     private final MediaItemRepository mediaItemRepository;
     private final CarToMediaItemRepository carToMediaItemRepository;
 
-
     @BeforeEach
     void prepare() {
         entityManager.getTransaction().begin();

@@ -1,5 +1,6 @@
 package com.bookingcar;
 
+import com.bookingcar.annotation.IT;
 import com.bookingcar.entity.Car;
 import com.bookingcar.entity.Request;
 import com.bookingcar.entity.User;
@@ -11,7 +12,10 @@ import com.bookingcar.entity.enums.UserStatus;
 import com.bookingcar.repository.CarRepository;
 import com.bookingcar.repository.RequestRepository;
 import com.bookingcar.repository.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -20,17 +24,23 @@ import java.time.temporal.ChronoUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RequestRepositoryIT extends BaseIntegrationTest {
+@IT
+@RequiredArgsConstructor
+class RequestRepositoryIT {
 
-    private static UserRepository userRepository;
-    private static CarRepository carRepository;
-    private static RequestRepository requestRepository;
+    private final EntityManager entityManager;
+    private final UserRepository userRepository;
+    private final CarRepository carRepository;
+    private final RequestRepository requestRepository;
 
-    @BeforeAll
-    static void initRepositories() {
-        userRepository = context.getBean(UserRepository.class);
-        carRepository = context.getBean(CarRepository.class);
-        requestRepository = context.getBean(RequestRepository.class);
+    @BeforeEach
+    void prepare() {
+        entityManager.getTransaction().begin();
+    }
+
+    @AfterEach
+    void closeConnection() {
+        entityManager.getTransaction().rollback();
     }
 
     @Test

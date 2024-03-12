@@ -1,7 +1,7 @@
 package com.bookingcar;
 
+import com.bookingcar.annotation.IT;
 import com.bookingcar.dto.UserFilterDto;
-import com.bookingcar.util.TestDataImporter;
 import com.bookingcar.entity.MediaItem;
 import com.bookingcar.entity.PersonalInfo;
 import com.bookingcar.entity.User;
@@ -13,7 +13,11 @@ import com.bookingcar.entity.enums.UserStatus;
 import com.bookingcar.repository.MediaItemRepository;
 import com.bookingcar.repository.PersonalInfoRepository;
 import com.bookingcar.repository.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
+import com.bookingcar.util.TestDataImporter;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -24,17 +28,23 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class UserRepositoryIT extends BaseIntegrationTest {
+@IT
+@RequiredArgsConstructor
+class UserRepositoryIT {
 
-    private static UserRepository userRepository;
-    private static PersonalInfoRepository personalInfoRepository;
-    private static MediaItemRepository mediaItemRepository;
+    private final EntityManager entityManager;
+    private final UserRepository userRepository;
+    private final PersonalInfoRepository personalInfoRepository;
+    private final MediaItemRepository mediaItemRepository;
 
-    @BeforeAll
-    static void initRepositories() {
-        userRepository = context.getBean(UserRepository.class);
-        personalInfoRepository = context.getBean(PersonalInfoRepository.class);
-        mediaItemRepository = context.getBean(MediaItemRepository.class);
+    @BeforeEach
+    void prepare() {
+        entityManager.getTransaction().begin();
+    }
+
+    @AfterEach
+    void closeConnection() {
+        entityManager.getTransaction().rollback();
     }
 
     @Nested
