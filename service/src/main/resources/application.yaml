@@ -5,14 +5,14 @@ db:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/booking_car
+    url: jdbc:postgresql://localhost:5432/booking_car
     username: postgres
     password: "0000"
     driver-class-name: org.postgresql.Driver
   jpa:
     properties:
       hibernate:
-          show_sql: true
-          format_sql: true
-          highlight_sql: true
-          hbm2ddl.auto: validate
+        show_sql: true
+        format_sql: true
+        highlight_sql: true
+        hbm2ddl.auto: validate
