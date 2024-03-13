@@ -1,5 +1,4 @@
-spring.main.allow-bean-definition-overriding: true
-
-db:
-  username: test
-  password: test
+spring:
+  main.allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/booking_car_test

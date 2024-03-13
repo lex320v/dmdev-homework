@@ -9,26 +9,28 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
+@ToString(exclude = {"car", "mediaItem"})
+@EqualsAndHashCode(exclude = {"car", "mediaItem"})
 public class CarToMediaItem implements IdentifiableEntity<CarToMediaItemId> {
 
     @EmbeddedId
     private CarToMediaItemId id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "car_id", referencedColumnName = "id", insertable = false, updatable = false)
-//    @MapsId("car_id")
+    @JoinColumn(name = "car_id", insertable = false, updatable = false)
     private Car car;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "media_item_id", referencedColumnName = "id", insertable = false, updatable = false)
-//    @MapsId("media_item_id")
+    @JoinColumn(name = "media_item_id", insertable = false, updatable = false)
     private MediaItem mediaItem;
 
     @Column(nullable = false)

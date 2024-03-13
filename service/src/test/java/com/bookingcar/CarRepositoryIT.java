@@ -17,10 +17,9 @@ import com.bookingcar.repository.MediaItemRepository;
 import com.bookingcar.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -29,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @IT
 @RequiredArgsConstructor
+@Transactional
 class CarRepositoryIT {
 
     private final EntityManager entityManager;
@@ -36,16 +36,6 @@ class CarRepositoryIT {
     private final CarRepository carRepository;
     private final MediaItemRepository mediaItemRepository;
     private final CarToMediaItemRepository carToMediaItemRepository;
-
-    @BeforeEach
-    void prepare() {
-        entityManager.getTransaction().begin();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        entityManager.getTransaction().rollback();
-    }
 
     @Nested
     class CarCRUD {
