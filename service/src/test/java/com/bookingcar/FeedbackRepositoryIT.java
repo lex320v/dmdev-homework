@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @IT
 @RequiredArgsConstructor
-class FeedbackRepositoryIT {
+class FeedbackRepositoryIT extends BaseIntegrationTest {
 
     private final EntityManager entityManager;
     private final UserRepository userRepository;

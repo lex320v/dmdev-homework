@@ -11,8 +11,6 @@ import com.bookingcar.repository.MediaItemRepository;
 import com.bookingcar.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -22,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @IT
 @RequiredArgsConstructor
-class MediaItemRepositoryIT {
+class MediaItemRepositoryIT extends BaseIntegrationTest {
 
     private final EntityManager entityManager;
     private final UserRepository userRepository;

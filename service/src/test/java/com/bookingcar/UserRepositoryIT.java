@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @IT
 @RequiredArgsConstructor
-class UserRepositoryIT {
+class UserRepositoryIT extends BaseIntegrationTest {
 
     private final EntityManager entityManager;
     private final UserRepository userRepository;

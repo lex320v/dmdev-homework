@@ -14,8 +14,6 @@ import com.bookingcar.repository.RequestRepository;
 import com.bookingcar.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -26,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @IT
 @RequiredArgsConstructor
-class RequestRepositoryIT {
+class RequestRepositoryIT extends BaseIntegrationTest {
 
     private final EntityManager entityManager;
     private final UserRepository userRepository;
