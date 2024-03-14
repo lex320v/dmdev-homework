@@ -3,7 +3,6 @@ package com.bookingcar.annotation;
 import com.bookingcar.config.ApplicationTestConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.annotation.ElementType;
@@ -15,7 +14,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ActiveProfiles("test")
 @SpringBootTest(classes = ApplicationTestConfiguration.class)
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @Transactional
 public @interface IT {
 }
