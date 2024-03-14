@@ -88,6 +88,7 @@ public class TestDataImporter {
 
         entityManager.persist(user);
         personalInfo.setUser(user);
+        entityManager.persist(personalInfo);
         entityManager.flush();
 
         return user;
