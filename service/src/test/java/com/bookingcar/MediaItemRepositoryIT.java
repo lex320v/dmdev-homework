@@ -28,16 +28,6 @@ class MediaItemRepositoryIT {
     private final UserRepository userRepository;
     private final MediaItemRepository mediaItemRepository;
 
-    @BeforeEach
-    void prepare() {
-        entityManager.getTransaction().begin();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        entityManager.getTransaction().rollback();
-    }
-
     @Test
     void createAndReadMediaItem() {
         var user = buildUser();

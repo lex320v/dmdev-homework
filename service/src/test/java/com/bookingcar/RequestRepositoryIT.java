@@ -33,16 +33,6 @@ class RequestRepositoryIT {
     private final CarRepository carRepository;
     private final RequestRepository requestRepository;
 
-    @BeforeEach
-    void prepare() {
-        entityManager.getTransaction().begin();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        entityManager.getTransaction().rollback();
-    }
-
     @Test
     void createAndReadRequest() {
         var user = buildUser();

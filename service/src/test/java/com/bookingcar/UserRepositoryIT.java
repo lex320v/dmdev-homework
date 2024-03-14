@@ -16,8 +16,6 @@ import com.bookingcar.repository.UserRepository;
 import com.bookingcar.util.TestDataImporter;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -36,16 +34,6 @@ class UserRepositoryIT {
     private final UserRepository userRepository;
     private final PersonalInfoRepository personalInfoRepository;
     private final MediaItemRepository mediaItemRepository;
-
-    @BeforeEach
-    void prepare() {
-        entityManager.getTransaction().begin();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        entityManager.getTransaction().rollback();
-    }
 
     @Nested
     class UserCRUD {

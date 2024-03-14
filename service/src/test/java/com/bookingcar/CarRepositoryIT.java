@@ -19,7 +19,6 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -28,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @IT
 @RequiredArgsConstructor
-@Transactional
 class CarRepositoryIT {
 
     private final EntityManager entityManager;

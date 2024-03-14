@@ -16,8 +16,6 @@ import com.bookingcar.repository.RequestRepository;
 import com.bookingcar.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -34,16 +32,6 @@ class FeedbackRepositoryIT {
     private final CarRepository carRepository;
     private final RequestRepository requestRepository;
     private final FeedbackRepository feedbackRepository;
-
-    @BeforeEach
-    void prepare() {
-        entityManager.getTransaction().begin();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        entityManager.getTransaction().rollback();
-    }
 
     @Test
     void createAndReadFeedback() {
