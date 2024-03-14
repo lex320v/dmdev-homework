@@ -1,6 +1,5 @@
 package com.bookingcar;
 
-import com.bookingcar.annotation.IT;
 import com.bookingcar.entity.Car;
 import com.bookingcar.entity.Request;
 import com.bookingcar.entity.User;
@@ -22,7 +21,6 @@ import java.time.temporal.ChronoUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@IT
 @RequiredArgsConstructor
 class RequestRepositoryIT extends BaseIntegrationTest {
 

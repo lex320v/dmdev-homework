@@ -1,12 +1,13 @@
 package com.bookingcar;
 
-import org.junit.jupiter.api.AfterAll;
+import com.bookingcar.annotation.IT;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+@IT
 @DirtiesContext
 public class BaseIntegrationTest {
 
@@ -15,11 +16,6 @@ public class BaseIntegrationTest {
     @BeforeAll
     static void beforeAll() {
         postgres.start();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        postgres.close();
     }
 
     @DynamicPropertySource

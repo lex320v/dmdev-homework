@@ -1,6 +1,5 @@
 package com.bookingcar;
 
-import com.bookingcar.annotation.IT;
 import com.bookingcar.entity.Car;
 import com.bookingcar.entity.CarToMediaItem;
 import com.bookingcar.entity.CarToMediaItemId;
@@ -25,7 +24,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@IT
 @RequiredArgsConstructor
 class CarRepositoryIT extends BaseIntegrationTest {
 

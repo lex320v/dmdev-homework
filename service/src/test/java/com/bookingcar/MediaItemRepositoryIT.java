@@ -1,6 +1,5 @@
 package com.bookingcar;
 
-import com.bookingcar.annotation.IT;
 import com.bookingcar.entity.MediaItem;
 import com.bookingcar.entity.User;
 import com.bookingcar.entity.enums.Gender;
@@ -18,7 +17,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@IT
 @RequiredArgsConstructor
 class MediaItemRepositoryIT extends BaseIntegrationTest {
 
