@@ -1,6 +1,5 @@
 package com.bookingcar.annotation;
 
-import com.bookingcar.config.ApplicationTestConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +12,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @ActiveProfiles("test")
-@SpringBootTest(classes = ApplicationTestConfiguration.class)
+@SpringBootTest
 @Transactional
 public @interface IT {
 }
