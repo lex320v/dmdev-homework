@@ -8,7 +8,8 @@ import com.bookingcar.entity.enums.Role;
 import com.bookingcar.entity.enums.UserStatus;
 import com.bookingcar.repository.MediaItemRepository;
 import com.bookingcar.repository.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -16,16 +17,12 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@RequiredArgsConstructor
 class MediaItemRepositoryIT extends BaseIntegrationTest {
 
-    private static UserRepository userRepository;
-    private static MediaItemRepository mediaItemRepository;
-
-    @BeforeAll
-    static void initRepositories() {
-        userRepository = context.getBean(UserRepository.class);
-        mediaItemRepository = context.getBean(MediaItemRepository.class);
-    }
+    private final EntityManager entityManager;
+    private final UserRepository userRepository;
+    private final MediaItemRepository mediaItemRepository;
 
     @Test
     void createAndReadMediaItem() {

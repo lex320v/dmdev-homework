@@ -1,36 +1,25 @@
 package com.bookingcar;
 
-import com.bookingcar.config.ApplicationTestConfiguration;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
+import com.bookingcar.annotation.IT;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
 
-abstract class BaseIntegrationTest {
+@IT
+public class BaseIntegrationTest {
 
-    protected static AnnotationConfigApplicationContext context;
-    protected static EntityManager entityManager;
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.2");
 
     @BeforeAll
-    static void init() {
-        context = new AnnotationConfigApplicationContext(ApplicationTestConfiguration.class);
-        entityManager = context.getBean(EntityManager.class);
+    static void beforeAll() {
+        postgres.start();
     }
 
-    @AfterAll
-    static void closeSessionFactory() {
-        context.close();
-    }
-
-    @BeforeEach
-    void prepare() {
-        entityManager.getTransaction().begin();
-    }
-
-    @AfterEach
-    void closeConnection() {
-        entityManager.getTransaction().rollback();
+    @DynamicPropertySource
+    static void dynamicProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
     }
 }

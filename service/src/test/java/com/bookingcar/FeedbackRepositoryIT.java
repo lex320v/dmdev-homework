@@ -13,7 +13,8 @@ import com.bookingcar.repository.CarRepository;
 import com.bookingcar.repository.FeedbackRepository;
 import com.bookingcar.repository.RequestRepository;
 import com.bookingcar.repository.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -21,20 +22,14 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@RequiredArgsConstructor
 class FeedbackRepositoryIT extends BaseIntegrationTest {
 
-    private static UserRepository userRepository;
-    private static CarRepository carRepository;
-    private static RequestRepository requestRepository;
-    private static FeedbackRepository feedbackRepository;
-
-    @BeforeAll
-    static void initRepositories() {
-        userRepository = context.getBean(UserRepository.class);
-        carRepository = context.getBean(CarRepository.class);
-        requestRepository = context.getBean(RequestRepository.class);
-        feedbackRepository = context.getBean(FeedbackRepository.class);
-    }
+    private final EntityManager entityManager;
+    private final UserRepository userRepository;
+    private final CarRepository carRepository;
+    private final RequestRepository requestRepository;
+    private final FeedbackRepository feedbackRepository;
 
     @Test
     void createAndReadFeedback() {

@@ -20,61 +20,55 @@ import java.time.LocalDateTime;
 public class TestDataImporter {
 
     public void importData(EntityManager entityManager) {
-        try {
-            saveUser(entityManager, "miness", "Александр", "Кузнецов", Gender.MALE, Role.SUPER_ADMIN);
-            saveUser(entityManager, "victorin", "Артём", "Михайлов", Gender.MALE, Role.ADMIN);
-            saveUser(entityManager, "xuan", "Михаил", "Черкасов", Gender.MALE, Role.ADMIN);
+        saveUser(entityManager, "miness", "Александр", "Кузнецов", Gender.MALE, Role.SUPER_ADMIN);
+        saveUser(entityManager, "victorin", "Артём", "Михайлов", Gender.MALE, Role.ADMIN);
+        saveUser(entityManager, "xuan", "Михаил", "Черкасов", Gender.MALE, Role.ADMIN);
 
-            var owner1 = saveUser(entityManager, "hagopati", "Константин", "Ларин", Gender.MALE, Role.OWNER);
-            var owner2 = saveUser(entityManager, "ilardin", "Анастасия", "Орлова", Gender.FEMALE, Role.OWNER);
-            saveUser(entityManager, "yatikai", "Анна", "Кочергина", Gender.FEMALE, Role.OWNER);
+        var owner1 = saveUser(entityManager, "hagopati", "Константин", "Ларин", Gender.MALE, Role.OWNER);
+        var owner2 = saveUser(entityManager, "ilardin", "Анастасия", "Орлова", Gender.FEMALE, Role.OWNER);
+        saveUser(entityManager, "yatikai", "Анна", "Кочергина", Gender.FEMALE, Role.OWNER);
 
-            var client1 = saveUser(entityManager, "atelgina", "Арина", "Новикова", Gender.FEMALE, Role.CLIENT);
-            var client2 = saveUser(entityManager, "michels", "Мирослава", "Суслова", Gender.FEMALE, Role.CLIENT);
-            saveUser(entityManager, "rtonyoka", "Александр", "Петров", Gender.MALE, Role.CLIENT);
-            saveUser(entityManager, "uniyand", "Василиса", "Сидорова", Gender.FEMALE, Role.CLIENT);
+        var client1 = saveUser(entityManager, "atelgina", "Арина", "Новикова", Gender.FEMALE, Role.CLIENT);
+        var client2 = saveUser(entityManager, "michels", "Мирослава", "Суслова", Gender.FEMALE, Role.CLIENT);
+        saveUser(entityManager, "rtonyoka", "Александр", "Петров", Gender.MALE, Role.CLIENT);
+        saveUser(entityManager, "uniyand", "Василиса", "Сидорова", Gender.FEMALE, Role.CLIENT);
 
-            var car1 = saveCar(entityManager, owner1, "Toyota", "Camry");
-            var car2 = saveCar(entityManager, owner2, "Ford", "Focus");
-            saveCar(entityManager, owner1, "Audi", "TT");
-            saveCar(entityManager, owner1, "Nissan", "X-Trail");
-            saveCar(entityManager, owner1, "Suzuki", "Swift");
-            saveCar(entityManager, owner1, "Citroen", "C4");
-            saveCar(entityManager, owner1, "Renault", "Zoe");
-            saveCar(entityManager, owner1, "Jeep", "Wrangler");
-            saveCar(entityManager, owner1, "Ford", "Explorer");
-            saveCar(entityManager, owner1, "Lexus", "ES");
-            saveCar(entityManager, owner1, "Volkswagen", "Jetta");
-            saveCar(entityManager, owner1, "GMC", "Terrain");
-            saveCar(entityManager, owner1, "Volkswagen", "Golf");
-            saveCar(entityManager, owner2, "Land Rover", "Range Rover");
-            saveCar(entityManager, owner2, "Toyota", "Tacoma");
-            saveCar(entityManager, owner2, "Lincoln", "MKZ");
+        var car1 = saveCar(entityManager, owner1, "Toyota", "Camry");
+        var car2 = saveCar(entityManager, owner2, "Ford", "Focus");
+        saveCar(entityManager, owner1, "Audi", "TT");
+        saveCar(entityManager, owner1, "Nissan", "X-Trail");
+        saveCar(entityManager, owner1, "Suzuki", "Swift");
+        saveCar(entityManager, owner1, "Citroen", "C4");
+        saveCar(entityManager, owner1, "Renault", "Zoe");
+        saveCar(entityManager, owner1, "Jeep", "Wrangler");
+        saveCar(entityManager, owner1, "Ford", "Explorer");
+        saveCar(entityManager, owner1, "Lexus", "ES");
+        saveCar(entityManager, owner1, "Volkswagen", "Jetta");
+        saveCar(entityManager, owner1, "GMC", "Terrain");
+        saveCar(entityManager, owner1, "Volkswagen", "Golf");
+        saveCar(entityManager, owner2, "Land Rover", "Range Rover");
+        saveCar(entityManager, owner2, "Toyota", "Tacoma");
+        saveCar(entityManager, owner2, "Lincoln", "MKZ");
 
-            saveRequest(entityManager, client1, car1, RequestStatus.OPEN);
-            saveRequest(entityManager, client1, car2, RequestStatus.OPEN);
-            saveRequest(entityManager, client2, car1, RequestStatus.OPEN);
+        saveRequest(entityManager, client1, car1, RequestStatus.OPEN);
+        saveRequest(entityManager, client1, car2, RequestStatus.OPEN);
+        saveRequest(entityManager, client2, car1, RequestStatus.OPEN);
 
-            var request1 = saveRequest(entityManager, client1, car1, RequestStatus.CLOSED);
-            var request2 = saveRequest(entityManager, client1, car1, RequestStatus.CLOSED);
-            var request3 = saveRequest(entityManager, client1, car1, RequestStatus.CLOSED);
+        var request1 = saveRequest(entityManager, client1, car1, RequestStatus.CLOSED);
+        var request2 = saveRequest(entityManager, client1, car1, RequestStatus.CLOSED);
+        var request3 = saveRequest(entityManager, client1, car1, RequestStatus.CLOSED);
 
-            var request4 = saveRequest(entityManager, client1, car2, RequestStatus.CLOSED);
-            var request5 = saveRequest(entityManager, client1, car2, RequestStatus.CLOSED);
-            var request6 = saveRequest(entityManager, client1, car2, RequestStatus.CLOSED);
+        var request4 = saveRequest(entityManager, client1, car2, RequestStatus.CLOSED);
+        var request5 = saveRequest(entityManager, client1, car2, RequestStatus.CLOSED);
+        var request6 = saveRequest(entityManager, client1, car2, RequestStatus.CLOSED);
 
-            saveFeedback(entityManager, request1, 3);
-            saveFeedback(entityManager, request2, 4);
-            saveFeedback(entityManager, request3, 5);
+        saveFeedback(entityManager, request1, 3);
+        saveFeedback(entityManager, request2, 4);
+        saveFeedback(entityManager, request3, 5);
 
-            saveFeedback(entityManager, request4, 2);
-            saveFeedback(entityManager, request5, 2);
-            saveFeedback(entityManager, request6, 3);
-        } catch (RuntimeException exception) {
-            entityManager.getTransaction().rollback();
-            throw exception;
-        }
-
+        saveFeedback(entityManager, request4, 2);
+        saveFeedback(entityManager, request5, 2);
+        saveFeedback(entityManager, request6, 3);
     }
 
     private User saveUser(EntityManager entityManager, String username, String firstname, String lastname,
@@ -94,6 +88,7 @@ public class TestDataImporter {
 
         entityManager.persist(user);
         personalInfo.setUser(user);
+        entityManager.persist(personalInfo);
         entityManager.flush();
 
         return user;

@@ -14,7 +14,8 @@ import com.bookingcar.repository.CarRepository;
 import com.bookingcar.repository.CarToMediaItemRepository;
 import com.bookingcar.repository.MediaItemRepository;
 import com.bookingcar.repository.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -23,20 +24,14 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@RequiredArgsConstructor
 class CarRepositoryIT extends BaseIntegrationTest {
 
-    private static UserRepository userRepository;
-    private static CarRepository carRepository;
-    private static MediaItemRepository mediaItemRepository;
-    private static CarToMediaItemRepository carToMediaItemRepository;
-
-    @BeforeAll
-    static void initRepositories() {
-        userRepository = context.getBean(UserRepository.class);
-        carRepository = context.getBean(CarRepository.class);
-        mediaItemRepository = context.getBean(MediaItemRepository.class);
-        carToMediaItemRepository = context.getBean(CarToMediaItemRepository.class);
-    }
+    private final EntityManager entityManager;
+    private final UserRepository userRepository;
+    private final CarRepository carRepository;
+    private final MediaItemRepository mediaItemRepository;
+    private final CarToMediaItemRepository carToMediaItemRepository;
 
     @Nested
     class CarCRUD {
