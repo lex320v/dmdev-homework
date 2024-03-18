@@ -2,13 +2,8 @@ package com.bookingcar.repository;
 
 import com.bookingcar.entity.CarToMediaItem;
 import com.bookingcar.entity.CarToMediaItemId;
-import jakarta.persistence.EntityManager;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class CarToMediaItemRepository extends BaseRepository<CarToMediaItemId, CarToMediaItem> {
+public interface CarToMediaItemRepository extends JpaRepository<CarToMediaItem, CarToMediaItemId> {
 
-    public CarToMediaItemRepository(EntityManager entityManager) {
-        super(CarToMediaItem.class, entityManager);
-    }
 }

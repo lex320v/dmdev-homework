@@ -1,13 +1,8 @@
 package com.bookingcar.repository;
 
 import com.bookingcar.entity.MediaItem;
-import jakarta.persistence.EntityManager;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class MediaItemRepository extends BaseRepository<Long, MediaItem> {
+public interface MediaItemRepository extends JpaRepository<MediaItem, Long> {
 
-    public MediaItemRepository(EntityManager entityManager) {
-        super(MediaItem.class, entityManager);
-    }
 }

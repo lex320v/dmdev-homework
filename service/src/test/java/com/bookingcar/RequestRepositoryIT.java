@@ -64,7 +64,7 @@ class RequestRepositoryIT extends BaseIntegrationTest {
         request.setDateTimeTo(updatedDateTime);
         request.setStatus(updatedStatus);
         request.setComment(updatedString);
-        requestRepository.update(request);
+        requestRepository.saveAndFlush(request);
 
         entityManager.detach(request);
         var requestFromDb = requestRepository.findById(request.getId());
@@ -86,6 +86,7 @@ class RequestRepositoryIT extends BaseIntegrationTest {
         carRepository.save(car);
         requestRepository.save(request);
         requestRepository.delete(request);
+        requestRepository.flush();
 
         var requestFromDb = requestRepository.findById(request.getId());
 

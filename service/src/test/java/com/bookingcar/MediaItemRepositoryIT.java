@@ -49,6 +49,7 @@ class MediaItemRepositoryIT extends BaseIntegrationTest {
         userRepository.save(user);
         mediaItemRepository.save(mediaItem);
         mediaItemRepository.delete(mediaItem);
+        mediaItemRepository.flush();
 
         var mediaItemFromDb = mediaItemRepository.findById(mediaItem.getId());
 

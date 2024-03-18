@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,7 +76,7 @@ class CarRepositoryIT extends BaseIntegrationTest {
             car.setActive(updatedBoolean);
             car.setType(updatedType);
 
-            carRepository.update(car);
+            carRepository.saveAndFlush(car);
 
             entityManager.detach(car);
             var carFromDb = carRepository.findById(car.getId());
@@ -101,6 +102,7 @@ class CarRepositoryIT extends BaseIntegrationTest {
 
             user.getCars().remove(car);
             carRepository.delete(car);
+            carRepository.flush();
 
             var carFromDb = carRepository.findById(car.getId());
 
@@ -123,21 +125,18 @@ class CarRepositoryIT extends BaseIntegrationTest {
             userRepository.save(user);
             carRepository.save(car);
 
-            mediaItemRepository.save(image1);
-            mediaItemRepository.save(image2);
-            mediaItemRepository.save(video);
+            mediaItemRepository.saveAll(List.of(image1, image2, video));
 
-            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
-            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
-            var carToMediaItem3 = buildCarToMediaItem(car, video, 1);
-
-            carToMediaItemRepository.save(carToMediaItem1);
-            carToMediaItemRepository.save(carToMediaItem2);
-            carToMediaItemRepository.save(carToMediaItem3);
-            entityManager.flush();
-            entityManager.detach(carToMediaItem1);
-            entityManager.detach(carToMediaItem2);
-            entityManager.detach(carToMediaItem3);
+            var carToMediaItems = List.of(
+                    buildCarToMediaItem(car, image1, 1),
+                    buildCarToMediaItem(car, image2, 2),
+                    buildCarToMediaItem(car, video, 1)
+            );
+            var updatedCarToMediaItems = carToMediaItemRepository.saveAllAndFlush(carToMediaItems);
+            // todo: ?????
+            entityManager.detach(updatedCarToMediaItems.get(0));
+            entityManager.detach(updatedCarToMediaItems.get(1));
+            entityManager.detach(updatedCarToMediaItems.get(2));
 
             var key1 = CarToMediaItemId.builder()
                     .carId(car.getId())
@@ -176,23 +175,22 @@ class CarRepositoryIT extends BaseIntegrationTest {
             userRepository.save(user);
             carRepository.save(car);
 
-            mediaItemRepository.save(image1);
-            mediaItemRepository.save(image2);
+            mediaItemRepository.saveAll(List.of(image1, image2));
 
             var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
             var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
+            var carToMediaItems = List.of(carToMediaItem1, carToMediaItem2);
 
-            carToMediaItemRepository.save(carToMediaItem1);
-            carToMediaItemRepository.save(carToMediaItem2);
+            carToMediaItemRepository.saveAllAndFlush(carToMediaItems);
 
             carToMediaItem1.setPosition(2);
-            carToMediaItemRepository.update(carToMediaItem1);
-
             carToMediaItem2.setPosition(1);
-            carToMediaItemRepository.update(carToMediaItem2);
 
-            entityManager.detach(carToMediaItem1);
-            entityManager.detach(carToMediaItem2);
+            var updatedCarToMediaItems = carToMediaItemRepository.saveAllAndFlush(carToMediaItems);
+
+            entityManager.detach(updatedCarToMediaItems.get(0));
+            entityManager.detach(updatedCarToMediaItems.get(1));
+
             var key1 = CarToMediaItemId.builder()
                     .carId(car.getId())
                     .mediaItemId(image1.getId())
@@ -227,18 +225,15 @@ class CarRepositoryIT extends BaseIntegrationTest {
             mediaItemRepository.save(image2);
             mediaItemRepository.save(video);
 
-            var carToMediaItem1 = buildCarToMediaItem(car, image1, 1);
-            var carToMediaItem2 = buildCarToMediaItem(car, image2, 2);
-            var carToMediaItem3 = buildCarToMediaItem(car, video, 1);
+            var carToMediaItems = List.of(
+                    buildCarToMediaItem(car, image1, 1),
+                    buildCarToMediaItem(car, image2, 2),
+                    buildCarToMediaItem(car, video, 1)
+            );
+            carToMediaItemRepository.saveAllAndFlush(carToMediaItems);
 
-            carToMediaItemRepository.save(carToMediaItem1);
-            carToMediaItemRepository.save(carToMediaItem2);
-            carToMediaItemRepository.save(carToMediaItem3);
-            entityManager.flush();
-
-            carToMediaItemRepository.delete(carToMediaItem1);
-            carToMediaItemRepository.delete(carToMediaItem2);
-            carToMediaItemRepository.delete(carToMediaItem3);
+            carToMediaItemRepository.deleteAll(carToMediaItems);
+            carToMediaItemRepository.flush();
 
             var key1 = CarToMediaItemId.builder()
                     .carId(car.getId())

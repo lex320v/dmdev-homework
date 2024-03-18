@@ -1,13 +1,8 @@
 package com.bookingcar.repository;
 
 import com.bookingcar.entity.Request;
-import jakarta.persistence.EntityManager;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class RequestRepository extends BaseRepository<Long, Request> {
+public interface RequestRepository extends JpaRepository<Request, Long> {
 
-    public RequestRepository(EntityManager entityManager) {
-        super(Request.class, entityManager);
-    }
 }

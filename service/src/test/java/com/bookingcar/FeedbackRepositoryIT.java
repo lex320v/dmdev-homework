@@ -77,7 +77,7 @@ class FeedbackRepositoryIT extends BaseIntegrationTest {
 
         feedback.setText(updatedString);
         feedback.setRating(updatedInteger);
-        feedbackRepository.update(feedback);
+        feedbackRepository.saveAndFlush(feedback);
 
         entityManager.detach(feedback);
         var feedbackFromDb = feedbackRepository.findById(feedback.getId());
@@ -105,6 +105,7 @@ class FeedbackRepositoryIT extends BaseIntegrationTest {
         feedbackRepository.save(feedback);
 
         feedbackRepository.delete(feedback);
+        feedbackRepository.flush();
 
         var feedbackFromDb = feedbackRepository.findById(feedback.getId());
 
