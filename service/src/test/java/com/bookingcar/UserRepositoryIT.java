@@ -11,10 +11,13 @@ import com.bookingcar.entity.enums.UserStatus;
 import com.bookingcar.repository.MediaItemRepository;
 import com.bookingcar.repository.PersonalInfoRepository;
 import com.bookingcar.repository.UserRepository;
+import com.bookingcar.util.TestDataImporter;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -93,60 +96,47 @@ class UserRepositoryIT extends BaseIntegrationTest {
             var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
             var user3 = buildUser("ссс", "Андрей", "Кузьмин");
 
-            userRepository.save(user1);
-            userRepository.save(user2);
-            userRepository.save(user3);
+            userRepository.saveAll(List.of(user1, user2, user3));
 
             var searchFirstname = "алекс";
             var searchLastname = "куз";
-//            UserFilterDto userFilterDto = UserFilterDto.builder()
-//                    .firstname(searchFirstname)
-//                    .lastname(searchLastname)
-//                    .build();
-//
-//            var result = userRepository.findAll(userFilterDto);
-//
-//            assertThat(result.size()).isEqualTo(2);
-//
-//            var result1 = result.get(0);
-//            var result2 = result.get(1);
-//
-//            assertTrue(result1.getFirstname().toLowerCase().contains(searchFirstname));
-//            assertTrue(result1.getLastname().toLowerCase().contains(searchLastname));
-//
-//            assertTrue(result2.getFirstname().toLowerCase().contains(searchFirstname));
-//            assertTrue(result2.getLastname().toLowerCase().contains(searchLastname));
+            var result = userRepository.findAllBy(searchFirstname, searchLastname);
+
+            assertThat(result.size()).isEqualTo(2);
+
+            var result1 = result.get(0);
+            var result2 = result.get(1);
+
+            assertTrue(result1.getFirstname().toLowerCase().contains(searchFirstname));
+            assertTrue(result1.getLastname().toLowerCase().contains(searchLastname));
+
+            assertTrue(result2.getFirstname().toLowerCase().contains(searchFirstname));
+            assertTrue(result2.getLastname().toLowerCase().contains(searchLastname));
         }
-//
-//        @Test
-//        void findAllByUsername() {
-//            var user1 = buildUser("aaa", "Александр", "Кузьмин");
-//            var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
-//
-//            userRepository.save(user1);
-//            userRepository.save(user2);
-//
-//            var searchUsername = "aaa";
-//            UserFilterDto userFilterDto = UserFilterDto.builder()
-//                    .username(searchUsername)
-//                    .build();
-//
-//            var result = userRepository.findAll(userFilterDto);
-//
-//            assertThat(result.size()).isEqualTo(1);
-//            assertThat(result.get(0).getUsername()).isEqualTo(searchUsername);
-//        }
-//
-//        @Test
-//        void findAllWithLimit() {
-//            TestDataImporter.importData(entityManager);
-//
-//            UserFilterDto userFilterDto = UserFilterDto.builder().limit(5).build();
-//
-//            var result = userRepository.findAll(userFilterDto);
-//
-//            assertThat(result.size()).isEqualTo(5);
-//        }
+
+        @Test
+        void findAllByUsername() {
+            var user1 = buildUser("aaa", "Александр", "Кузьмин");
+            var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
+
+            userRepository.saveAll(List.of(user1, user2));
+
+            var searchUsername = "aaa";
+            var result = userRepository.findByUsernameContainingIgnoreCase(searchUsername);
+
+            assertThat(result.size()).isEqualTo(1);
+            assertThat(result.get(0).getUsername()).isEqualTo(searchUsername);
+        }
+
+        @Test
+        void findAllWithLimit() {
+            TestDataImporter.importData(entityManager);
+
+            var pageable = PageRequest.of(1, 5, Sort.sort(User.class).by(User::getCreatedAt));
+            var result = userRepository.findAll(pageable);
+
+            assertThat(result.getContent().size()).isEqualTo(5);
+        }
     }
 
     @Nested
