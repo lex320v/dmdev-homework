@@ -1,5 +1,6 @@
 package com.bookingcar;
 
+import com.bookingcar.dto.UserFilterDto;
 import com.bookingcar.entity.MediaItem;
 import com.bookingcar.entity.PersonalInfo;
 import com.bookingcar.entity.User;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @RequiredArgsConstructor
@@ -88,6 +90,21 @@ class UserRepositoryIT extends BaseIntegrationTest {
             Optional<User> userFromDb = userRepository.findById(user.getId());
 
             assertTrue(userFromDb.isEmpty());
+        }
+
+        @Test
+        void findAllByFilter() {
+            var user1 = buildUser("aaa", "Александр", "Кузьмин");
+            var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
+            var user3 = buildUser("ссс", "Андрей", "Кузьмин");
+
+            userRepository.saveAll(List.of(user1, user2, user3));
+
+            var filter = UserFilterDto.builder().firstname("лекс").build();
+
+            var users = userRepository.findAllByFilter(filter);
+
+            assertEquals(2, users.size());
         }
 
         @Test
