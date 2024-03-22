@@ -93,7 +93,7 @@ class UserRepositoryIT extends BaseIntegrationTest {
         }
 
         @Test
-        void findAllByFilter() {
+        void findAllByFilterQueryDsl() {
             var user1 = buildUser("aaa", "Александр", "Кузьмин");
             var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
             var user3 = buildUser("ссс", "Андрей", "Кузьмин");
@@ -101,8 +101,21 @@ class UserRepositoryIT extends BaseIntegrationTest {
             userRepository.saveAll(List.of(user1, user2, user3));
 
             var filter = UserFilterDto.builder().firstname("лекс").build();
+            var users = userRepository.findAllByFilterQueryDsl(filter);
 
-            var users = userRepository.findAllByFilter(filter);
+            assertEquals(2, users.size());
+        }
+
+        @Test
+        void findAllByFilterCriteria() {
+            var user1 = buildUser("aaa", "Александр", "Кузьмин");
+            var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
+            var user3 = buildUser("ссс", "Андрей", "Кузьмин");
+
+            userRepository.saveAll(List.of(user1, user2, user3));
+
+            var filter = UserFilterDto.builder().firstname("лекс").build();
+            var users = userRepository.findAllByFilterCriteria(filter);
 
             assertEquals(2, users.size());
         }

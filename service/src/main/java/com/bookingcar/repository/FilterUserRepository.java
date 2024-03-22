@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface FilterUserRepository {
 
-    List<User> findAllByFilter(UserFilterDto userFilterDto);
+    List<User> findAllByFilterCriteria(UserFilterDto userFilterDto);
+
+    List<User> findAllByFilterQueryDsl(UserFilterDto userFilterDto);
 }

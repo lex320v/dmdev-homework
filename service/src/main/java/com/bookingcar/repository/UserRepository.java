@@ -11,9 +11,9 @@ public interface UserRepository extends JpaRepository<User, Long>, FilterUserRep
 
     @EntityGraph(attributePaths = {"avatarMediaItem"})
     @Query("""
-        select u from users u
-        where u.firstname ilike %:firstname% and u.lastname ilike %:lastname%
-    """)
+                select u from users u
+                where u.firstname ilike %:firstname% and u.lastname ilike %:lastname%
+            """)
     List<User> findAllBy(String firstname, String lastname);
 
     List<User> findByUsernameContainingIgnoreCase(String username);
