@@ -1,3 +1,6 @@
+--liquibase formatted sql
+
+--changeset lex:1
 CREATE TABLE media_item
 (
     id           BIGSERIAL PRIMARY KEY,
@@ -6,11 +9,12 @@ CREATE TABLE media_item
     uploader_id  BIGINT                                                           NOT NULL,
     link         VARCHAR(255)                                                     NOT NULL,
     preview_link VARCHAR(255),
-    created_at   TIMESTAMP(6) DEFAULT NOW()                                       NOT NULL,
-    updated_at   TIMESTAMP(6) DEFAULT NOW()                                       NOT NULL
+    created_at   timestamp(6) DEFAULT NOW()                                       NOT NULL,
+    updated_at   timestamp(6) DEFAULT NOW()                                       NOT NULL
 
 );
 
+--changeset lex:2
 CREATE TABLE users
 (
     id                   BIGSERIAL PRIMARY KEY,
@@ -22,9 +26,9 @@ CREATE TABLE users
     gender               VARCHAR(20) CHECK (gender IN ('MALE', 'FEMALE'))                        NOT NULL,
     role                 VARCHAR(20) CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'OWNER', 'CLIENT')) NOT NULL,
     avatar_media_item_id BIGINT UNIQUE REFERENCES media_item (id) ON DELETE SET NULL,
-    deleted_at           TIMESTAMP(6),
-    created_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL,
-    updated_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL
+    deleted_at           timestamp(6),
+    created_at           timestamp(6) DEFAULT NOW()                                              NOT NULL,
+    updated_at           timestamp(6) DEFAULT NOW()                                              NOT NULL
 
 );
 
@@ -32,6 +36,7 @@ ALTER TABLE media_item
     ADD CONSTRAINT media_item_uploader_id_fkey
         FOREIGN KEY (uploader_id) REFERENCES users (id) ON DELETE CASCADE;
 
+--changeset lex:3
 CREATE TABLE personal_info
 (
     user_id                       BIGINT PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE NOT NULL,
@@ -47,6 +52,7 @@ CREATE TABLE personal_info
     driver_license_categories     VARCHAR(2) ARRAY
 );
 
+--changeset lex:4
 CREATE TABLE car
 (
     id           BIGSERIAL PRIMARY KEY,
@@ -58,10 +64,12 @@ CREATE TABLE car
     active       BOOLEAN                                                                                NOT NULL,
     price        FLOAT(53)                                                                              NOT NULL,
     owner_id     BIGINT REFERENCES users (id) ON DELETE CASCADE                                         NOT NULL,
-    created_at   TIMESTAMP(6) DEFAULT NOW()                                                             NOT NULL,
-    updated_at   TIMESTAMP(6) DEFAULT NOW()                                                             NOT NULL
+    created_at   timestamp(6) DEFAULT NOW()                                                             NOT NULL,
+    updated_at   timestamp(6) DEFAULT NOW()                                                             NOT NULL
 );
 
+
+--changeset lex:5
 CREATE TABLE car_to_media_item
 (
     car_id        BIGINT REFERENCES car (id) ON DELETE CASCADE        NOT NULL,
@@ -70,6 +78,7 @@ CREATE TABLE car_to_media_item
     PRIMARY KEY (car_id, media_item_id)
 );
 
+--changeset lex:6
 CREATE TABLE request
 (
     id             BIGSERIAL PRIMARY KEY,
@@ -77,21 +86,23 @@ CREATE TABLE request
     comment        VARCHAR(255),
     car_id         BIGINT REFERENCES car (id)                                                 NOT NULL,
     client_id      BIGINT REFERENCES users (id)                                               NOT NULL,
-    date_time_from TIMESTAMP(6)                                                               NOT NULL,
-    date_time_to   TIMESTAMP(6)                                                               NOT NULL,
-    created_at     TIMESTAMP(6) DEFAULT NOW()                                                 NOT NULL,
-    updated_at     TIMESTAMP(6) DEFAULT NOW()                                                 NOT NULL
+    date_time_from timestamp(6)                                                               NOT NULL,
+    date_time_to   timestamp(6)                                                               NOT NULL,
+    created_at     timestamp(6) DEFAULT NOW()                                                 NOT NULL,
+    updated_at     timestamp(6) DEFAULT NOW()                                                 NOT NULL
 );
 
+
+--changeset lex:7
 CREATE TABLE feedback
 (
     id         BIGSERIAL PRIMARY KEY,
     rating     INTEGER                        NOT NULL,
     text       VARCHAR(255),
     request_id BIGINT REFERENCES request (id) NOT NULL,
-    deleted_at TIMESTAMP(6),
-    created_at TIMESTAMP(6) DEFAULT NOW()     NOT NULL,
-    updated_at TIMESTAMP(6) DEFAULT NOW()     NOT NULL
+    deleted_at timestamp(6),
+    created_at timestamp(6) DEFAULT NOW()     NOT NULL,
+    updated_at timestamp(6) DEFAULT NOW()     NOT NULL
 );
 
 
