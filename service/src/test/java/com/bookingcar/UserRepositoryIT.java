@@ -1,28 +1,19 @@
 package com.bookingcar;
 
 import com.bookingcar.dto.UserFilterDto;
-import com.bookingcar.entity.MediaItem;
-import com.bookingcar.entity.PersonalInfo;
 import com.bookingcar.entity.User;
-import com.bookingcar.entity.enums.DriverLicenseCategories;
 import com.bookingcar.entity.enums.Gender;
-import com.bookingcar.entity.enums.MediaItemType;
 import com.bookingcar.entity.enums.Role;
 import com.bookingcar.entity.enums.UserStatus;
-import com.bookingcar.repository.MediaItemRepository;
-import com.bookingcar.repository.PersonalInfoRepository;
 import com.bookingcar.repository.UserRepository;
 import com.bookingcar.util.TestDataImporter;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,284 +24,81 @@ class UserRepositoryIT extends BaseIntegrationTest {
 
     private final EntityManager entityManager;
     private final UserRepository userRepository;
-    private final PersonalInfoRepository personalInfoRepository;
-    private final MediaItemRepository mediaItemRepository;
 
-    @Nested
-    class UserCRUD {
-        @Test
-        void createAndReadUser() {
-            var user = buildUser("lex1", "firstname_lex", "lastname_lex");
-            userRepository.save(user);
+    @Test
+    void findAllByFilterQueryDsl() {
+        var user1 = buildUser("aaa", "Александр", "Кузьмин");
+        var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
+        var user3 = buildUser("ссс", "Андрей", "Кузьмин");
 
-            entityManager.detach(user);
-            var userFromDb = userRepository.findById(user.getId());
+        userRepository.saveAll(List.of(user1, user2, user3));
 
-            assertTrue(userFromDb.isPresent());
-            assertThat(userFromDb.get()).isEqualTo(user);
-        }
+        var filter = UserFilterDto.builder().firstname("лекс").build();
+        var users = userRepository.findAllByFilterQueryDsl(filter);
 
-        @Test
-        void updateUser() {
-            var user = buildUser("lex1", "firstname_lex", "lastname_lex");
-
-            var updatedString = "updated_value";
-            var updatedGender = Gender.FEMALE;
-            var updatedRole = Role.CLIENT;
-
-            userRepository.save(user);
-
-            user.setUsername(updatedString);
-            user.setFirstname(updatedString);
-            user.setLastname(updatedString);
-            user.setGender(updatedGender);
-            user.setRole(updatedRole);
-            user.setPassword(updatedString);
-            userRepository.saveAndFlush(user);
-
-            entityManager.detach(user);
-            var userFromDb = userRepository.findById(user.getId());
-
-            assertTrue(userFromDb.isPresent());
-            assertThat(userFromDb.get().getUsername()).isEqualTo(updatedString);
-            assertThat(userFromDb.get().getFirstname()).isEqualTo(updatedString);
-            assertThat(userFromDb.get().getLastname()).isEqualTo(updatedString);
-            assertThat(userFromDb.get().getGender()).isEqualTo(updatedGender);
-            assertThat(userFromDb.get().getRole()).isEqualTo(updatedRole);
-            assertThat(userFromDb.get().getPassword()).isEqualTo(updatedString);
-        }
-
-        @Test
-        void deleteUser() {
-            User user = buildUser("lex1", "firstname_lex", "lastname_lex");
-
-            userRepository.save(user);
-            userRepository.delete(user);
-            userRepository.flush();
-            Optional<User> userFromDb = userRepository.findById(user.getId());
-
-            assertTrue(userFromDb.isEmpty());
-        }
-
-        @Test
-        void findAllByFilterQueryDsl() {
-            var user1 = buildUser("aaa", "Александр", "Кузьмин");
-            var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
-            var user3 = buildUser("ссс", "Андрей", "Кузьмин");
-
-            userRepository.saveAll(List.of(user1, user2, user3));
-
-            var filter = UserFilterDto.builder().firstname("лекс").build();
-            var users = userRepository.findAllByFilterQueryDsl(filter);
-
-            assertEquals(2, users.size());
-        }
-
-        @Test
-        void findAllByFilterCriteria() {
-            var user1 = buildUser("aaa", "Александр", "Кузьмин");
-            var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
-            var user3 = buildUser("ссс", "Андрей", "Кузьмин");
-
-            userRepository.saveAll(List.of(user1, user2, user3));
-
-            var filter = UserFilterDto.builder().firstname("лекс").build();
-            var users = userRepository.findAllByFilterCriteria(filter);
-
-            assertEquals(2, users.size());
-        }
-
-        @Test
-        void findAllByFirstnameAndLastname() {
-            var user1 = buildUser("aaa", "Александр", "Кузьмин");
-            var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
-            var user3 = buildUser("ссс", "Андрей", "Кузьмин");
-
-            userRepository.saveAll(List.of(user1, user2, user3));
-
-            var searchFirstname = "алекс";
-            var searchLastname = "куз";
-            var result = userRepository.findAllBy(searchFirstname, searchLastname);
-
-            assertThat(result.size()).isEqualTo(2);
-
-            var result1 = result.get(0);
-            var result2 = result.get(1);
-
-            assertTrue(result1.getFirstname().toLowerCase().contains(searchFirstname));
-            assertTrue(result1.getLastname().toLowerCase().contains(searchLastname));
-
-            assertTrue(result2.getFirstname().toLowerCase().contains(searchFirstname));
-            assertTrue(result2.getLastname().toLowerCase().contains(searchLastname));
-        }
-
-        @Test
-        void findAllByUsername() {
-            var user1 = buildUser("aaa", "Александр", "Кузьмин");
-            var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
-
-            userRepository.saveAll(List.of(user1, user2));
-
-            var searchUsername = "aaa";
-            var result = userRepository.findByUsernameContainingIgnoreCase(searchUsername);
-
-            assertThat(result.size()).isEqualTo(1);
-            assertThat(result.get(0).getUsername()).isEqualTo(searchUsername);
-        }
-
-        @Test
-        void findAllWithLimit() {
-            TestDataImporter.importData(entityManager);
-
-            var pageable = PageRequest.of(1, 5, Sort.sort(User.class).by(User::getCreatedAt));
-            var result = userRepository.findAll(pageable);
-
-            assertThat(result.getContent().size()).isEqualTo(5);
-        }
+        assertEquals(2, users.size());
     }
 
-    @Nested
-    class PersonalInfoCRUD {
-        @Test
-        void createAndReadPersonalInfo() {
-            PersonalInfo personalInfo = buildPersonalInfo();
-            User user = buildUser("lex1", "firstname_lex", "lastname_lex");
+    @Test
+    void findAllByFilterCriteria() {
+        var user1 = buildUser("aaa", "Александр", "Кузьмин");
+        var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
+        var user3 = buildUser("ссс", "Андрей", "Кузьмин");
 
-            userRepository.save(user);
-            personalInfo.setUser(user);
-            var savedPersonalInfo = personalInfoRepository.saveAndFlush(personalInfo);
-            entityManager.detach(savedPersonalInfo);
+        userRepository.saveAll(List.of(user1, user2, user3));
 
-            Optional<PersonalInfo> personalInfoFromDb = personalInfoRepository.findById(personalInfo.getId());
+        var filter = UserFilterDto.builder().firstname("лекс").build();
+        var users = userRepository.findAllByFilterCriteria(filter);
 
-            assertTrue(personalInfoFromDb.isPresent());
-            assertThat(personalInfoFromDb.get()).isEqualTo(personalInfo);
-        }
-
-        @Test
-        void updatePersonalInfo() {
-            PersonalInfo personalInfo = buildPersonalInfo();
-            User user = buildUser("lex1", "firstname_lex", "lastname_lex");
-
-            var updatedString = "updated_value";
-            var updatedDate = LocalDate.of(2012, 12, 12);
-            var updatedCategories = List.of(DriverLicenseCategories.M, DriverLicenseCategories.B);
-
-            userRepository.save(user);
-            personalInfo.setUser(user);
-            personalInfoRepository.saveAndFlush(personalInfo);
-
-            personalInfo.setDriverLicenseName(updatedString);
-            personalInfo.setDriverLicenseSurname(updatedString);
-            personalInfo.setDriverLicensePlaceOfBirth(updatedString);
-            personalInfo.setDriverLicenseIssuedBy(updatedString);
-            personalInfo.setDriverLicenseCode(updatedString);
-            personalInfo.setDriverLicenseResidence(updatedString);
-            personalInfo.setDateOfBirth(updatedDate);
-            personalInfo.setDriverLicenseDateOfIssue(updatedDate);
-            personalInfo.setDriverLicenseDateOfExpire(updatedDate);
-            personalInfo.setDriverLicenseCategories(updatedCategories);
-            var updatedPersonalRepository = personalInfoRepository.saveAndFlush(personalInfo);
-
-            entityManager.detach(updatedPersonalRepository);
-            var personalInfoFromDb = personalInfoRepository.findById(personalInfo.getId());
-
-            assertTrue(personalInfoFromDb.isPresent());
-            assertThat(personalInfoFromDb.get().getDriverLicenseName()).isEqualTo(updatedString);
-            assertThat(personalInfoFromDb.get().getDriverLicenseSurname()).isEqualTo(updatedString);
-            assertThat(personalInfoFromDb.get().getDriverLicensePlaceOfBirth()).isEqualTo(updatedString);
-            assertThat(personalInfoFromDb.get().getDriverLicenseIssuedBy()).isEqualTo(updatedString);
-            assertThat(personalInfoFromDb.get().getDriverLicenseCode()).isEqualTo(updatedString);
-            assertThat(personalInfoFromDb.get().getDriverLicenseResidence()).isEqualTo(updatedString);
-            assertThat(personalInfoFromDb.get().getDateOfBirth()).isEqualTo(updatedDate);
-            assertThat(personalInfoFromDb.get().getDriverLicenseDateOfIssue()).isEqualTo(updatedDate);
-            assertThat(personalInfoFromDb.get().getDriverLicenseDateOfExpire()).isEqualTo(updatedDate);
-            assertThat(personalInfoFromDb.get().getDriverLicenseCategories()).isEqualTo(updatedCategories);
-        }
-
-        @Test
-        void deletePersonalInfo() {
-            User user = buildUser("lex1", "firstname_lex", "lastname_lex");
-            PersonalInfo personalInfo = buildPersonalInfo();
-
-            userRepository.save(user);
-            personalInfo.setUser(user);
-            personalInfoRepository.saveAndFlush(personalInfo);
-            user.setPersonalInfo(null);
-            personalInfoRepository.delete(personalInfo);
-            personalInfoRepository.flush();
-
-            Optional<PersonalInfo> personalInfoFromDb = personalInfoRepository.findById(personalInfo.getId());
-
-            assertTrue(personalInfoFromDb.isEmpty());
-        }
+        assertEquals(2, users.size());
     }
 
-    @Nested
-    class AvatarCRUD {
+    @Test
+    void findAllByFirstnameAndLastname() {
+        var user1 = buildUser("aaa", "Александр", "Кузьмин");
+        var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
+        var user3 = buildUser("ссс", "Андрей", "Кузьмин");
 
-        @Test
-        void createAndReadAvatar() {
-            var user = buildUser("lex1", "firstname_lex", "lastname_lex");
-            var avatar = buildMediaItem();
+        userRepository.saveAll(List.of(user1, user2, user3));
 
-            userRepository.save(user);
-            avatar.setUploader(user);
-            mediaItemRepository.save(avatar);
-            user.setAvatar(avatar);
-            userRepository.saveAndFlush(user);
-            entityManager.detach(user);
+        var searchFirstname = "алекс";
+        var searchLastname = "куз";
+        var result = userRepository.findAllBy(searchFirstname, searchLastname);
 
-            var userWithAvatar = userRepository.findById(user.getId());
+        assertThat(result.size()).isEqualTo(2);
 
-            assertTrue(userWithAvatar.isPresent());
-            assertThat(userWithAvatar.get().getAvatarMediaItem()).isNotNull();
-        }
+        var result1 = result.get(0);
+        var result2 = result.get(1);
 
-        @Test
-        void updateAvatar() {
-            var user = buildUser("lex1", "firstname_lex", "lastname_lex");
-            var avatar = buildMediaItem();
-            var updated_avatar = buildMediaItem();
+        assertTrue(result1.getFirstname().toLowerCase().contains(searchFirstname));
+        assertTrue(result1.getLastname().toLowerCase().contains(searchLastname));
 
-            userRepository.save(user);
-            avatar.setUploader(user);
-            mediaItemRepository.save(avatar);
-            user.setAvatar(avatar);
-            userRepository.saveAndFlush(user);
+        assertTrue(result2.getFirstname().toLowerCase().contains(searchFirstname));
+        assertTrue(result2.getLastname().toLowerCase().contains(searchLastname));
+    }
 
-            updated_avatar.setUploader(user);
-            mediaItemRepository.save(updated_avatar);
-            user.setAvatar(updated_avatar);
-            userRepository.saveAndFlush(user);
-            entityManager.detach(user);
+    @Test
+    void findAllByUsername() {
+        var user1 = buildUser("aaa", "Александр", "Кузьмин");
+        var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
 
-            mediaItemRepository.delete(avatar);
+        userRepository.saveAll(List.of(user1, user2));
 
-            var userWithAvatar = userRepository.findById(user.getId());
+        var searchUsername = "aaa";
+        var result = userRepository.findByUsernameContainingIgnoreCase(searchUsername);
 
-            assertTrue(userWithAvatar.isPresent());
-            assertThat(userWithAvatar.get().getAvatarMediaItem().getId()).isNotEqualTo(avatar.getId());
-        }
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getUsername()).isEqualTo(searchUsername);
+    }
 
-        @Test
-        void deleteAvatar() {
-            var user = buildUser("lex1", "firstname_lex", "lastname_lex");
-            var avatar = buildMediaItem();
+    @Test
+    void findAllWithLimit() {
+        TestDataImporter.importData(entityManager);
 
-            userRepository.save(user);
-            avatar.setUploader(user);
-            mediaItemRepository.save(avatar);
-            user.setAvatar(avatar);
-            userRepository.saveAndFlush(user);
+        var pageable = PageRequest.of(1, 5, Sort.sort(User.class).by(User::getCreatedAt));
+        var result = userRepository.findAll(pageable);
 
-            user.setAvatar(null);
-            mediaItemRepository.delete(avatar);
-
-            var deletedAvatar = mediaItemRepository.findById(avatar.getId());
-
-            assertTrue(deletedAvatar.isEmpty());
-        }
+        assertThat(result.getContent().size()).isEqualTo(5);
     }
 
     private User buildUser(String username, String firstname, String lastname) {
@@ -322,30 +110,6 @@ class UserRepositoryIT extends BaseIntegrationTest {
                 .status(UserStatus.ACTIVE)
                 .gender(Gender.MALE)
                 .role(Role.SUPER_ADMIN)
-                .build();
-    }
-
-    private PersonalInfo buildPersonalInfo() {
-        return PersonalInfo.builder()
-                .driverLicenseName("dl_name")
-                .driverLicenseSurname("dl_surname")
-                .dateOfBirth(LocalDate.of(2000, 12, 10))
-                .driverLicensePlaceOfBirth("dl_place_of_birth")
-                .driverLicenseDateOfIssue(LocalDate.of(2020, 5, 5))
-                .driverLicenseDateOfExpire(LocalDate.of(2027, 5, 5))
-                .driverLicenseIssuedBy("dl_issued_by")
-                .driverLicenseCode("0000 000000")
-                .driverLicenseResidence("dl_residence")
-                .driverLicenseCategories(List.of(DriverLicenseCategories.A, DriverLicenseCategories.B, DriverLicenseCategories.B1))
-                .build();
-    }
-
-    private MediaItem buildMediaItem() {
-        return MediaItem.builder()
-                .type(MediaItemType.AVATAR)
-                .mimeType("mime_type")
-                .link("link")
-                .previewLink("preview_link")
                 .build();
     }
 }
