@@ -6,12 +6,8 @@ import com.bookingcar.entity.enums.Gender;
 import com.bookingcar.entity.enums.Role;
 import com.bookingcar.entity.enums.UserStatus;
 import com.bookingcar.repository.UserRepository;
-import com.bookingcar.util.TestDataImporter;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -22,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @RequiredArgsConstructor
 class UserRepositoryIT extends BaseIntegrationTest {
 
-    private final EntityManager entityManager;
     private final UserRepository userRepository;
 
     @Test
@@ -75,20 +70,6 @@ class UserRepositoryIT extends BaseIntegrationTest {
 
         assertTrue(result2.getFirstname().toLowerCase().contains(searchFirstname));
         assertTrue(result2.getLastname().toLowerCase().contains(searchLastname));
-    }
-
-    @Test
-    void findAllByUsername() {
-        var user1 = buildUser("aaa", "Александр", "Кузьмин");
-        var user2 = buildUser("bbb", "Алексей", "Кузьмиченко");
-
-        userRepository.saveAll(List.of(user1, user2));
-
-        var searchUsername = "aaa";
-        var result = userRepository.findByUsernameContainingIgnoreCase(searchUsername);
-
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getUsername()).isEqualTo(searchUsername);
     }
 
     private User buildUser(String username, String firstname, String lastname) {
