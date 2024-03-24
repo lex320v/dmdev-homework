@@ -41,10 +41,6 @@ public class FilterUserRepositoryImpl implements FilterUserRepository {
 
         var query = entityManager.createQuery(criteria);
 
-        if (userFilterDto.getLimit() != null) {
-            query.setMaxResults(userFilterDto.getLimit());
-        }
-
         return query.getResultList();
     }
 
@@ -61,10 +57,6 @@ public class FilterUserRepositoryImpl implements FilterUserRepository {
                 .from(user)
                 .where(predicate)
                 .orderBy(user.createdAt.asc());
-
-        if (userFilterDto.getLimit() != null) {
-            query.limit(userFilterDto.getLimit());
-        }
 
         return query.fetch();
     }
