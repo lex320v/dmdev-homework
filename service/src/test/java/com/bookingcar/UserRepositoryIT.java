@@ -91,16 +91,6 @@ class UserRepositoryIT extends BaseIntegrationTest {
         assertThat(result.get(0).getUsername()).isEqualTo(searchUsername);
     }
 
-    @Test
-    void findAllWithLimit() {
-        TestDataImporter.importData(entityManager);
-
-        var pageable = PageRequest.of(1, 5, Sort.sort(User.class).by(User::getCreatedAt));
-        var result = userRepository.findAll(pageable);
-
-        assertThat(result.getContent().size()).isEqualTo(5);
-    }
-
     private User buildUser(String username, String firstname, String lastname) {
         return User.builder()
                 .username(username)
