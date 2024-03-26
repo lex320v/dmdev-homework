@@ -5,10 +5,8 @@ import com.bookingcar.entity.User;
 import com.bookingcar.entity.User_;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.bookingcar.entity.QUser.user;
@@ -24,24 +22,17 @@ public class FilterUserRepositoryImpl implements FilterUserRepository {
         var criteria = cb.createQuery(User.class);
         var user = criteria.from(User.class);
 
-        List<Predicate> predicates = new ArrayList<>();
-        if (userFilterDto.getFirstname() != null) {
-            predicates.add(cb.like(user.get(User_.firstname), "%" + userFilterDto.getFirstname() + "%"));
-        }
-        if (userFilterDto.getLastname() != null) {
-            predicates.add(cb.like(user.get(User_.lastname), "%" + userFilterDto.getLastname() + "%"));
-        }
-        if (userFilterDto.getUsername() != null) {
-            predicates.add(cb.like(user.get(User_.username), "%" + userFilterDto.getUsername() + "%"));
-        }
+        var predicates = CriteriaPredicate.builder()
+                .add(userFilterDto.getFirstname(), user.get(User_.firstname), (a, b) -> cb.like(cb.upper(a), "%" + b.toUpperCase() + "%" ))
+                .add(userFilterDto.getLastname(), user.get(User_.lastname), (a, b) -> cb.like(cb.upper(a), "%" + b.toUpperCase() + "%" ))
+                .add(userFilterDto.getUsername(), user.get(User_.username), (a, b) -> cb.like(cb.upper(a), "%" + b.toUpperCase() + "%" ))
+                .build();
 
         criteria.select(user)
-                .where(predicates.toArray(Predicate[]::new))
+                .where(predicates)
                 .orderBy(cb.asc(user.get(User_.createdAt)));
 
-        var query = entityManager.createQuery(criteria);
-
-        return query.getResultList();
+        return entityManager.createQuery(criteria).getResultList();
     }
 
     @Override
@@ -52,12 +43,11 @@ public class FilterUserRepositoryImpl implements FilterUserRepository {
                 .add(userFilterDto.getUsername(), user.username::containsIgnoreCase)
                 .buildAnd();
 
-        var query = new JPAQuery<User>(entityManager)
+        return new JPAQuery<User>(entityManager)
                 .select(user)
                 .from(user)
                 .where(predicate)
-                .orderBy(user.createdAt.asc());
-
-        return query.fetch();
+                .orderBy(user.createdAt.asc())
+                .fetch();
     }
 }
