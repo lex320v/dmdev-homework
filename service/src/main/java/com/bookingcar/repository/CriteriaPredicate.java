@@ -1,13 +1,12 @@
 package com.bookingcar.repository;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CriteriaPredicate {
@@ -18,22 +17,9 @@ public class CriteriaPredicate {
         return new CriteriaPredicate();
     }
 
-    public CriteriaPredicate add(String search, Expression<String> field, CriteriaPredicateFunction function) {
+    public <T, U> CriteriaPredicate add(T search, U field, BiFunction<U, T, Predicate> function) {
         if (search != null) {
             predicates.add(function.apply(field, search));
-        }
-
-        return this;
-    }
-
-    public CriteriaPredicate addILike(
-            String search,
-            Expression<String> field,
-            CriteriaBuilder cb
-    ) {
-        if (search != null) {
-            var predicate = cb.like(cb.upper(field), "%" + search.toUpperCase() + "%" );
-            predicates.add(predicate);
         }
 
         return this;

@@ -23,9 +23,9 @@ public class FilterUserRepositoryImpl implements FilterUserRepository {
         var user = criteria.from(User.class);
 
         var predicates = CriteriaPredicate.builder()
-                .addILike(userFilterDto.getFirstname(), user.get(User_.firstname), cb)
-                .addILike(userFilterDto.getLastname(), user.get(User_.lastname), cb)
-                .addILike(userFilterDto.getUsername(), user.get(User_.username), cb)
+                .add(userFilterDto.getFirstname(), user.get(User_.firstname), (a, b) -> cb.like(cb.upper(a), "%" + b.toUpperCase() + "%" ))
+                .add(userFilterDto.getLastname(), user.get(User_.lastname), (a, b) -> cb.like(cb.upper(a), "%" + b.toUpperCase() + "%" ))
+                .add(userFilterDto.getUsername(), user.get(User_.username), (a, b) -> cb.like(cb.upper(a), "%" + b.toUpperCase() + "%" ))
                 .build();
 
         criteria.select(user)

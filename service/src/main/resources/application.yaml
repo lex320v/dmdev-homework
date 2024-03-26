@@ -11,9 +11,3 @@ spring:
         format_sql: true
         highlight_sql: true
         hbm2ddl.auto: validate
-
-#logging:
-#  level:
-#    org.hibernate.orm.jdbc.bind: trace
-#    org.hibernate.SQL: DEBUG
-#    org.hibernate.type: TRACE
