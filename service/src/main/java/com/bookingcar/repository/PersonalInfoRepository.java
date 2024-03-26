@@ -1,13 +1,8 @@
 package com.bookingcar.repository;
 
 import com.bookingcar.entity.PersonalInfo;
-import jakarta.persistence.EntityManager;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class PersonalInfoRepository extends BaseRepository<Long, PersonalInfo> {
+public interface PersonalInfoRepository extends JpaRepository<PersonalInfo, Long> {
 
-    public PersonalInfoRepository(EntityManager entityManager) {
-        super(PersonalInfo.class, entityManager);
-    }
 }

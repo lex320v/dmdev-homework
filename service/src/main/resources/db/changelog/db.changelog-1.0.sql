@@ -1,3 +1,6 @@
+--liquibase formatted sql
+
+--changeset lex:1
 CREATE TABLE media_item
 (
     id           BIGSERIAL PRIMARY KEY,
@@ -8,9 +11,9 @@ CREATE TABLE media_item
     preview_link VARCHAR(255),
     created_at   TIMESTAMP(6) DEFAULT NOW()                                       NOT NULL,
     updated_at   TIMESTAMP(6) DEFAULT NOW()                                       NOT NULL
-
 );
 
+--changeset lex:2
 CREATE TABLE users
 (
     id                   BIGSERIAL PRIMARY KEY,
@@ -25,13 +28,13 @@ CREATE TABLE users
     deleted_at           TIMESTAMP(6),
     created_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL,
     updated_at           TIMESTAMP(6) DEFAULT NOW()                                              NOT NULL
-
 );
 
 ALTER TABLE media_item
     ADD CONSTRAINT media_item_uploader_id_fkey
         FOREIGN KEY (uploader_id) REFERENCES users (id) ON DELETE CASCADE;
 
+--changeset lex:3
 CREATE TABLE personal_info
 (
     user_id                       BIGINT PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE NOT NULL,
@@ -47,6 +50,7 @@ CREATE TABLE personal_info
     driver_license_categories     VARCHAR(2) ARRAY
 );
 
+--changeset lex:4
 CREATE TABLE car
 (
     id           BIGSERIAL PRIMARY KEY,
@@ -62,6 +66,8 @@ CREATE TABLE car
     updated_at   TIMESTAMP(6) DEFAULT NOW()                                                             NOT NULL
 );
 
+
+--changeset lex:5
 CREATE TABLE car_to_media_item
 (
     car_id        BIGINT REFERENCES car (id) ON DELETE CASCADE        NOT NULL,
@@ -70,6 +76,7 @@ CREATE TABLE car_to_media_item
     PRIMARY KEY (car_id, media_item_id)
 );
 
+--changeset lex:6
 CREATE TABLE request
 (
     id             BIGSERIAL PRIMARY KEY,
@@ -83,6 +90,8 @@ CREATE TABLE request
     updated_at     TIMESTAMP(6) DEFAULT NOW()                                                 NOT NULL
 );
 
+
+--changeset lex:7
 CREATE TABLE feedback
 (
     id         BIGSERIAL PRIMARY KEY,

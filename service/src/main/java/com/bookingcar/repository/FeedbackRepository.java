@@ -1,13 +1,8 @@
 package com.bookingcar.repository;
 
 import com.bookingcar.entity.Feedback;
-import jakarta.persistence.EntityManager;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class FeedbackRepository extends BaseRepository<Long, Feedback> {
+public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
-    public FeedbackRepository(EntityManager entityManager) {
-        super(Feedback.class, entityManager);
-    }
 }

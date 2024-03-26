@@ -1,10 +1,12 @@
 package com.bookingcar.entity;
 
 import com.bookingcar.entity.enums.DriverLicenseCategories;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -50,7 +52,7 @@ public class PersonalInfo implements IdentifiableEntity<Long> {
     @Enumerated(EnumType.STRING)
     private List<DriverLicenseCategories> driverLicenseCategories;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @PrimaryKeyJoinColumn
     private User user;
 
