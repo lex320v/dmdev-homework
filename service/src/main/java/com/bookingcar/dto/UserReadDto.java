@@ -5,11 +5,12 @@ import com.bookingcar.entity.enums.Role;
 import lombok.Value;
 
 @Value
-public class UserCreateEditDto {
+public class UserReadDto {
+    Long id;
     String username;
-    String password;
     String firstname;
     String lastname;
     Role role;
     Gender gender;
+    PersonalInfoReadDto personalInfoReadDto;
 }
