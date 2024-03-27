@@ -31,5 +31,6 @@ public class UserCreateEditDtoMapper implements Mapper<UserCreateEditDto, User> 
         user.setRole(object.getRole());
         user.setGender(object.getGender());
         user.setStatus(UserStatus.ACTIVE);
+        user.setDateOfBirth(object.getBirthDate());
     }
 }

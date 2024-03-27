@@ -56,7 +56,7 @@ class UserServiceIT extends BaseIntegrationTest {
                 "test",
                 Role.ADMIN,
                 Gender.MALE,
-                LocalDate.of(1994, 4, 5)
+                LocalDate.of(2001, 1, 1)
         );
 
         var createdUser = userService.create(userCreateEditDto);
@@ -79,7 +79,7 @@ class UserServiceIT extends BaseIntegrationTest {
                 "test",
                 Role.ADMIN,
                 Gender.MALE,
-                LocalDate.of(1994, 4, 5)
+                LocalDate.of(2001, 1, 1)
         );
 
         var updatedUser = userService.update(savedUser.getId(), userCreateEditDto);
@@ -112,6 +112,7 @@ class UserServiceIT extends BaseIntegrationTest {
                 .status(UserStatus.ACTIVE)
                 .gender(Gender.MALE)
                 .role(Role.SUPER_ADMIN)
+                .dateOfBirth(LocalDate.of(2001, 1, 1))
                 .build();
     }
 }

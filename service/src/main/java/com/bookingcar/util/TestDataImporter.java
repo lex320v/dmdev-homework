@@ -2,7 +2,6 @@ package com.bookingcar.util;
 
 import com.bookingcar.entity.Car;
 import com.bookingcar.entity.Feedback;
-import com.bookingcar.entity.PersonalInfo;
 import com.bookingcar.entity.Request;
 import com.bookingcar.entity.User;
 import com.bookingcar.entity.enums.CarType;
@@ -73,9 +72,6 @@ public class TestDataImporter {
 
     private User saveUser(EntityManager entityManager, String username, String firstname, String lastname,
                           Gender gender, Role role) {
-        var personalInfo = PersonalInfo.builder()
-                .dateOfBirth(LocalDate.of(randomInt(1990, 2000), randomInt(1, 12), randomInt(1, 28)))
-                .build();
         var user = User.builder()
                 .username(username)
                 .firstname(firstname)
@@ -84,11 +80,10 @@ public class TestDataImporter {
                 .status(UserStatus.ACTIVE)
                 .gender(gender)
                 .role(role)
+                .dateOfBirth(LocalDate.of(randomInt(1990, 2000), randomInt(1, 12), randomInt(1, 28)))
                 .build();
 
         entityManager.persist(user);
-        personalInfo.setUser(user);
-        entityManager.persist(personalInfo);
         entityManager.flush();
 
         return user;

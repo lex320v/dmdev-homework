@@ -9,8 +9,7 @@ public class PersonalInfoReadMapper implements Mapper<PersonalInfo, PersonalInfo
     @Override
     public PersonalInfoReadDto map(PersonalInfo object) {
         return new PersonalInfoReadDto(
-                object.getId(),
-                object.getDateOfBirth()
+                object.getId()
         );
     }
 }

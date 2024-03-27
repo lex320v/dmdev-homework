@@ -30,8 +30,6 @@ public class PersonalInfo implements IdentifiableEntity<Long> {
     @Column(name = "user_id")
     private Long id;
 
-    private LocalDate dateOfBirth;
-
     private String driverLicenseSurname;
 
     private String driverLicenseName;

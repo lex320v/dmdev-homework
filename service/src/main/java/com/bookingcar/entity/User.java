@@ -23,6 +23,7 @@ import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,9 @@ public class User extends BaseEntitySoftDelete<Long> {
 
     @Column(nullable = false)
     private String lastname;
+
+    @Column(nullable = false)
+    private LocalDate dateOfBirth;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -22,6 +22,7 @@ CREATE TABLE users
     password             VARCHAR(255)                                                            NOT NULL,
     firstname            VARCHAR(255)                                                            NOT NULL,
     lastname             VARCHAR(255)                                                            NOT NULL,
+    date_of_birth        DATE                                                                    NOT NULL,
     gender               VARCHAR(20) CHECK (gender IN ('MALE', 'FEMALE'))                        NOT NULL,
     role                 VARCHAR(20) CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'OWNER', 'CLIENT')) NOT NULL,
     avatar_media_item_id BIGINT UNIQUE REFERENCES media_item (id) ON DELETE SET NULL,
@@ -38,7 +39,6 @@ ALTER TABLE media_item
 CREATE TABLE personal_info
 (
     user_id                       BIGINT PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE NOT NULL,
-    date_of_birth                 DATE,
     driver_license_date_of_expire DATE,
     driver_license_date_of_issue  DATE,
     driver_license_code           VARCHAR(255),
