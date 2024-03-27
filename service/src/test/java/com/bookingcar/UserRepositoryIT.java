@@ -9,6 +9,7 @@ import com.bookingcar.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,6 +82,7 @@ class UserRepositoryIT extends BaseIntegrationTest {
                 .status(UserStatus.ACTIVE)
                 .gender(Gender.MALE)
                 .role(Role.SUPER_ADMIN)
+                .dateOfBirth(LocalDate.of(2001, 1, 1))
                 .build();
     }
 }
