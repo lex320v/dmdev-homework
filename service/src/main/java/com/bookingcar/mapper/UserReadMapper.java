@@ -2,6 +2,7 @@ package com.bookingcar.mapper;
 
 import com.bookingcar.dto.UserReadDto;
 import com.bookingcar.entity.User;
+import com.bookingcar.repository.PersonalInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -10,13 +11,13 @@ import org.springframework.stereotype.Component;
 public class UserReadMapper implements Mapper<User, UserReadDto> {
 
     private final PersonalInfoReadMapper personalInfoReadMapper;
+    private final PersonalInfoRepository personalInfoRepository;
 
     @Override
     public UserReadDto map(User object) {
-        // todo: personal info null
-//        var personalInfo = Optional.ofNullable(object.getPersonalInfo())
-//                .map(personalInfoReadMapper::map)
-//                .orElse(null);
+        var personalInfo = personalInfoRepository.findById(object.getId())
+                .map(personalInfoReadMapper::map)
+                .orElse(null);
 
         return new UserReadDto(
                 object.getId(),
@@ -25,7 +26,7 @@ public class UserReadMapper implements Mapper<User, UserReadDto> {
                 object.getLastname(),
                 object.getRole(),
                 object.getGender(),
-                null
+                personalInfo
         );
     }
 }

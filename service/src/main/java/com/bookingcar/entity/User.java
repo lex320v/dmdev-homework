@@ -30,7 +30,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"personalInfo", "avatarMediaItem", "cars", "mediaItems", "requests"}, callSuper = true)
+@ToString(exclude = {/*"personalInfo", */"avatarMediaItem", "cars", "mediaItems", "requests"}, callSuper = true)
 @EqualsAndHashCode(of = "username", callSuper = false)
 @Entity(name = "users")
 public class User extends BaseEntitySoftDelete<Long> {
@@ -62,8 +62,8 @@ public class User extends BaseEntitySoftDelete<Long> {
     @Column(nullable = false)
     private UserStatus status;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, optional = false)
-    private PersonalInfo personalInfo;
+//    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, optional = false)
+//    private PersonalInfo personalInfo;
 
     @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
