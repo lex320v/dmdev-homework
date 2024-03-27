@@ -19,9 +19,8 @@ public class GreetingController {
     }
 
     @GetMapping("/bye")
-    public ModelAndView bye(ModelAndView modelAndView) {
-        modelAndView.setViewName("greeting/bye");
+    public String bye() {
 
-        return modelAndView;
+        return "greeting/bye";
     }
 }
