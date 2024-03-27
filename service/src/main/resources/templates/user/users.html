@@ -2,9 +2,11 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Users</title>
 </head>
 <body>
-    <h1>USERS</h1>
+    <div th:each="user : ${users}">
+        <a th:href="@{'/users/' + ${user.id}}" th:text="|${user.id}. ${user.username}|">User</a>
+    </div>
 </body>
 </html>

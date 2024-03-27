@@ -1,6 +1,7 @@
 package com.bookingcar.http.controller;
 
 import com.bookingcar.dto.UserCreateEditDto;
+import com.bookingcar.entity.enums.Role;
 import com.bookingcar.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,7 @@ public class UserController {
         return userService.findById(id)
                 .map(userReadDto -> {
                     model.addAttribute("user", userReadDto);
+                    model.addAttribute("roles", Role.values());
                     return "user/user";
                 })
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
